@@ -2,77 +2,194 @@
 <html lang="en">
 
 <head>
+
     <meta charset="UTF-8">
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Debt Calculator</title>
+
+    <title>Debt Manager</title>
 
     <link rel="stylesheet" href="css/style.css">
+
 </head>
 
 <body>
 
     <div class="container">
 
+        <!-- Header -->
+
         <header class="app-header">
 
-    <div class="header-left">
-        <div class="logo">💰</div>
+            <div class="header-left">
 
-        <div>
-            <h1>Debt Manager</h1>
-            <p>Track debts. Reduce interest. Become debt free.</p>
-        </div>
-    </div>
+                <div class="logo">💰</div>
 
-    <button class="settings-button">
-        ⚙️
-    </button>
+                <div>
 
-</header>
+                    <h1>Debt Manager</h1>
+
+                    <p>Track debts. Reduce interest. Become debt free.</p>
+
+                </div>
+
+            </div>
+
+            <button class="settings-button">
+                ⚙️
+            </button>
+
+        </header>
+
+        <!-- Dashboard -->
 
         <div class="summary">
 
             <div class="card">
-    <h2>Total Debt</h2>
-    <p id="totalDebt">£0.00</p>
-</div>
 
-<div class="card">
-    <h2>Monthly Interest</h2>
-    <p id="monthlyInterest">£0.00</p>
-</div>
+                <h2>Total Debt</h2>
 
-<div class="card">
-    <h2>Debt Free</h2>
-    <p id="debtFree">--</p>
-</div>
+                <p id="totalDebt">£0.00</p>
+
+            </div>
+
+            <div class="card">
+
+                <h2>Monthly Interest</h2>
+
+                <p id="monthlyInterest">£0.00</p>
+
+            </div>
+
+            <div class="card">
+
+                <h2>Total Credit Limit</h2>
+
+                <p id="creditLimit">£0.00</p>
+
+            </div>
+
+            <div class="card">
+
+                <h2>Overall Utilisation</h2>
+
+                <p id="utilisation">0%</p>
+
+            </div>
+
+            <div class="card">
+
+                <h2>Total Minimum Payments</h2>
+
+                <p id="minimumPayments">£0.00</p>
+
+            </div>
+
+            <div class="card">
+
+                <h2>Debt Free</h2>
+
+                <p id="debtFree">--</p>
+
+            </div>
 
         </div>
 
+        <!-- Add Debt -->
+
         <h2>Your Debts</h2>
 
-<div class="add-debt">
+        <div class="add-debt">
 
-    <input type="text" id="lender" placeholder="Lender">
+            <input
+                type="text"
+                id="lender"
+                placeholder="Lender">
 
-    <input type="number" id="balance" placeholder="Balance">
+            <input
+                type="number"
+                id="balance"
+                placeholder="Balance">
 
-    <input type="number" id="apr" placeholder="APR">
+            <input
+                type="number"
+                id="apr"
+                placeholder="APR">
 
-    <input
-    type="number"
-    id="limit"
-    placeholder="Credit Limit">
+            <input
+                type="number"
+                id="limit"
+                placeholder="Credit Limit">
 
-    <input type="number" id="minimum" placeholder="Minimum Payment">
+            <input
+                type="number"
+                id="minimum"
+                placeholder="Minimum Payment">
 
-    <button id="addDebtButton" onclick="addDebt()">
-    Add Debt
-</button>
+            <button
+                id="addDebtButton"
+                onclick="addDebt()">
+
+                Add Debt
+
+            </button>
+
+        </div>
+
+        <!-- Repayment Planner -->
+
+        <h2>Repayment Planner</h2>
+
+<div class="planner">
+
+    <div class="planner-budget">
+
+        <label>Monthly Budget</label>
+
+        <input
+            type="number"
+            id="monthlyBudget"
+            placeholder="£350">
+
+    </div>
+
+    <div class="planner-strategy">
+
+        <label>Repayment Strategy</label>
+
+        <select id="strategy">
+
+            <option value="avalanche">
+                🔥 Avalanche (Highest APR)
+            </option>
+
+            <option value="snowball">
+                ❄️ Snowball (Smallest Balance)
+            </option>
+
+            <option value="minimum">
+                💳 Minimum Payments
+            </option>
+
+        </select>
+
+    </div>
+
+    <button
+        class="planner-button"
+        onclick="calculatePlan()">
+
+        Calculate Plan
+
+    </button>
 
 </div>
 
-<div id="debts"></div>
+<div id="repaymentPlan"></div>
+
+        <!-- Debt Cards -->
+
+        <div id="debts"></div>
 
     </div>
 
@@ -80,6 +197,7 @@
     <script src="js/ui.js"></script>
     <script src="js/storage.js"></script>
     <script src="js/calculations.js"></script>
+    <script src="js/planner.js"></script>
     <script src="js/app.js"></script>
 
 </body>
