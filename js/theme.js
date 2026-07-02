@@ -72,6 +72,42 @@ function hslToHex(h, s, l) {
     return rgbToHex(r, g, b);
 }
 
+// WCAG relative luminance / contrast ratio. Deliberately not derived
+// from HSL lightness — HSL lightness doesn't track perceived
+// brightness consistently across hues (a saturated yellow at 50%
+// HSL lightness reads far brighter than a blue at the same HSL
+// lightness, since green dominates the luminance formula), so an
+// HSL-only approach silently produces illegible text for some hues.
+function relativeLuminance(hex) {
+    const { r, g, b } = hexToRgb(hex);
+    const [rs, gs, bs] = [r, g, b].map(v => {
+        v /= 255;
+        return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+    });
+    return 0.2126 * rs + 0.7152 * gs + 0.0722 * bs;
+}
+
+function contrastRatio(hexA, hexB) {
+    const lA = relativeLuminance(hexA);
+    const lB = relativeLuminance(hexB);
+    const lighter = Math.max(lA, lB);
+    const darker = Math.min(lA, lB);
+    return (lighter + 0.05) / (darker + 0.05);
+}
+
+// Searches a set of candidate lightness values (ordered from most
+// subtle to most bold) for the first one that clears minContrast
+// against bgHex, falling back to the boldest candidate if none do —
+// guaranteeing every returned colour is at least readable, while
+// preferring the most subtle option that still qualifies.
+function pickContrastingLightness(hue, sat, candidates, bgHex, minContrast) {
+    for (const l of candidates) {
+        const hex = hslToHex(hue, sat, l);
+        if (contrastRatio(hex, bgHex) >= minContrast) return hex;
+    }
+    return hslToHex(hue, sat, candidates[candidates.length - 1]);
+}
+
 // Builds a full, coherent palette from a single background colour:
 // elevated surfaces get progressively lighter than it, text/muted
 // flip to near-white or near-black depending on whether the
@@ -89,7 +125,6 @@ function derivePalette(bgHex) {
     // for text to stay legible, even if someone picks near-pure
     // black or white.
     const bgL = Math.max(4, Math.min(94, hsl.l));
-    const isDark = bgL < 50;
     const hasHue = hsl.s > 12;
 
     const bg = hslToHex(hsl.h, hsl.s, bgL);
@@ -99,12 +134,33 @@ function derivePalette(bgHex) {
     const surfaceLight = hslToHex(hsl.h, hsl.s, Math.min(bgL + 13, 97));
     const surfaceHover = hslToHex(hsl.h, hsl.s, Math.min(bgL + 20, 98));
 
-    const text = hslToHex(hsl.h, Math.min(hsl.s, 15), isDark ? 95 : 10);
-    const muted = hslToHex(hsl.h, Math.min(hsl.s, 15), isDark ? 68 : 40);
+    // Almost none of the text in the app sits directly on --bg — it
+    // sits on these elevated surfaces instead, so that's what needs
+    // to be readable against. Picking the better of near-white/
+    // near-black against --surface-hover (the lightest one) is
+    // mathematically guaranteed to clear ~4.58:1 contrast, whatever
+    // the background colour turns out to be.
+    const whiteText = "#ffffff";
+    const blackText = "#000000";
+    const isDark = contrastRatio(whiteText, surfaceHover) >= contrastRatio(blackText, surfaceHover);
+    const text = isDark ? whiteText : blackText;
+
+    // Muted text should look visibly dimmer than the main text, but
+    // still meet a reasonable minimum contrast — search from most
+    // subtle to boldest and stop at the first one that qualifies,
+    // rather than assuming a fixed lightness offset will always work.
+    const mutedCandidates = isDark ? [55, 62, 68, 74, 80, 86, 92, 96, 99] : [45, 38, 32, 26, 20, 14, 8, 2];
+    const muted = pickContrastingLightness(hsl.h, Math.min(hsl.s, 15), mutedCandidates, surfaceHover, 3);
 
     const accent = hasHue
         ? hslToHex(hsl.h, Math.max(hsl.s, 65), isDark ? 62 : 40)
         : hslToHex(hsl.h, 8, isDark ? 95 : 8);
+
+    // A couple of buttons/badges use the accent as their background
+    // with text on top — accent and bg are derived independently, so
+    // there's no guarantee bg itself contrasts against accent (it
+    // often doesn't). Pick whichever of white/black actually does.
+    const accentContrast = contrastRatio("#ffffff", accent) >= contrastRatio("#000000", accent) ? "#ffffff" : "#000000";
 
     const primaryL = isDark ? Math.min(bgL + 14, 90) : Math.max(bgL - 14, 10);
     const primaryHoverL = isDark ? Math.min(bgL + 22, 92) : Math.max(bgL - 22, 6);
@@ -121,7 +177,7 @@ function derivePalette(bgHex) {
     const accentRgbParts = hexToRgb(accent);
     const accentRgb = `${accentRgbParts.r},${accentRgbParts.g},${accentRgbParts.b}`;
 
-    return { bg, bgDeep, surface, surfaceLight, surfaceHover, text, muted, accent, accentRgb, primary, primaryHover, border };
+    return { bg, bgDeep, surface, surfaceLight, surfaceHover, text, muted, accent, accentRgb, accentContrast, primary, primaryHover, border };
 }
 
 function applyThemeColor(bgHex) {
@@ -140,6 +196,7 @@ function applyThemeColor(bgHex) {
     root.style.setProperty("--muted", palette.muted);
     root.style.setProperty("--accent", palette.accent);
     root.style.setProperty("--accent-rgb", palette.accentRgb);
+    root.style.setProperty("--accent-contrast", palette.accentContrast);
     root.style.setProperty("--primary", palette.primary);
     root.style.setProperty("--primary-hover", palette.primaryHover);
     root.style.setProperty("--border", palette.border);
@@ -175,7 +232,7 @@ function resetTheme() {
     localStorage.removeItem("themeBackground");
     const root = document.documentElement;
     ["--bg", "--bg-deep", "--surface", "--surface-light", "--surface-hover",
-     "--text", "--muted", "--accent", "--accent-rgb", "--primary", "--primary-hover", "--border"]
+     "--text", "--muted", "--accent", "--accent-rgb", "--accent-contrast", "--primary", "--primary-hover", "--border"]
         .forEach(prop => root.style.removeProperty(prop));
     syncThemeInputs(DEFAULT_BG_COLOUR);
 }

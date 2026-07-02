@@ -19,6 +19,7 @@
     --primary:#00594F;
     --primary-hover:#00786A;
     --accent:#C4F000;
+    --accent-contrast:#081512;
 
     --success:#00A650;
     --warning:#FFB800;
@@ -199,7 +200,7 @@ h3, h4 { font-family:var(--font-display); font-weight:600; letter-spacing:.5px; 
 .priority-badge {
     display:inline-block;
     background:var(--accent);
-    color:var(--bg);
+    color:var(--accent-contrast);
     font-family:var(--font-display);
     font-size:.7rem;
     font-weight:700;
@@ -687,7 +688,7 @@ h3, h4 { font-family:var(--font-display); font-weight:600; letter-spacing:.5px; 
     cursor:pointer;
     transition:.2s;
 }
-.log-payment-btn:hover { background:var(--accent); color:var(--bg); }
+.log-payment-btn:hover { background:var(--accent); color:var(--accent-contrast); }
 .log-payment-btn:active { transform:scale(.96); }
 
 .log-charge-btn {
@@ -789,7 +790,7 @@ h3, h4 { font-family:var(--font-display); font-weight:600; letter-spacing:.5px; 
     cursor:pointer;
     transition:.2s;
 }
-#addDebtButton:hover { background:var(--accent); color:var(--bg); }
+#addDebtButton:hover { background:var(--accent); color:var(--accent-contrast); }
 #addDebtButton:active { transform:scale(.96); }
 
 #cancelEditButton {
