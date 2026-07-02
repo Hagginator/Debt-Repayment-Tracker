@@ -118,7 +118,10 @@ function derivePalette(bgHex) {
     const textRgb = hexToRgb(text);
     const border = `rgba(${textRgb.r}, ${textRgb.g}, ${textRgb.b}, .12)`;
 
-    return { bg, bgDeep, surface, surfaceLight, surfaceHover, text, muted, accent, primary, primaryHover, border };
+    const accentRgbParts = hexToRgb(accent);
+    const accentRgb = `${accentRgbParts.r},${accentRgbParts.g},${accentRgbParts.b}`;
+
+    return { bg, bgDeep, surface, surfaceLight, surfaceHover, text, muted, accent, accentRgb, primary, primaryHover, border };
 }
 
 function applyThemeColor(bgHex) {
@@ -136,6 +139,7 @@ function applyThemeColor(bgHex) {
     root.style.setProperty("--text", palette.text);
     root.style.setProperty("--muted", palette.muted);
     root.style.setProperty("--accent", palette.accent);
+    root.style.setProperty("--accent-rgb", palette.accentRgb);
     root.style.setProperty("--primary", palette.primary);
     root.style.setProperty("--primary-hover", palette.primaryHover);
     root.style.setProperty("--border", palette.border);
@@ -171,7 +175,7 @@ function resetTheme() {
     localStorage.removeItem("themeBackground");
     const root = document.documentElement;
     ["--bg", "--bg-deep", "--surface", "--surface-light", "--surface-hover",
-     "--text", "--muted", "--accent", "--primary", "--primary-hover", "--border"]
+     "--text", "--muted", "--accent", "--accent-rgb", "--primary", "--primary-hover", "--border"]
         .forEach(prop => root.style.removeProperty(prop));
     syncThemeInputs(DEFAULT_BG_COLOUR);
 }

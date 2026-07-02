@@ -17,7 +17,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Debt Manager">
 
-    <link rel="stylesheet" href="css/style.css?v=32">
+    <link rel="stylesheet" href="css/style.css?v=33">
 
 </head>
 
@@ -250,6 +250,38 @@
 
             </div>
 
+            <div class="reverse-planner">
+
+                <p class="reverse-planner-label">Or work backwards — pick a deadline and I'll tell you what to pay:</p>
+
+                <div class="reverse-planner-row">
+
+                    <div class="reverse-planner-field">
+                        <label for="targetTimeframe">Debt-Free In</label>
+                        <select id="targetTimeframe" onchange="toggleCustomMonthsField()">
+                            <option value="6">6 Months</option>
+                            <option value="12" selected>1 Year</option>
+                            <option value="18">18 Months</option>
+                            <option value="24">2 Years</option>
+                            <option value="36">3 Years</option>
+                            <option value="60">5 Years</option>
+                            <option value="custom">Custom…</option>
+                        </select>
+                    </div>
+
+                    <div class="reverse-planner-field hidden" id="customMonthsField">
+                        <label for="customMonths">Months</label>
+                        <input type="number" id="customMonths" min="1" step="1" placeholder="e.g. 15">
+                    </div>
+
+                    <button class="planner-button" onclick="calculateRequiredBudget()">🎯 Work It Out</button>
+
+                </div>
+
+                <div id="requiredBudgetResult"></div>
+
+            </div>
+
             <div id="repaymentPlan"></div>
 
         </div>
@@ -331,19 +363,19 @@
     <!-- Full-screen confetti burst, drawn when a debt is fully paid off -->
     <canvas id="confettiCanvas" class="hidden"></canvas>
 
-    <script src="js/debts.js?v=32"></script>
-    <script src="js/ui.js?v=32"></script>
-    <script src="js/storage.js?v=32"></script>
-    <script src="js/calculations.js?v=32"></script>
-    <script src="js/payments.js?v=32"></script>
-    <script src="js/tabs.js?v=32"></script>
-    <script src="js/settings.js?v=32"></script>
-    <script src="js/theme.js?v=32"></script>
-    <script src="js/confetti.js?v=32"></script>
+    <script src="js/debts.js?v=33"></script>
+    <script src="js/ui.js?v=33"></script>
+    <script src="js/storage.js?v=33"></script>
+    <script src="js/calculations.js?v=33"></script>
+    <script src="js/payments.js?v=33"></script>
+    <script src="js/tabs.js?v=33"></script>
+    <script src="js/settings.js?v=33"></script>
+    <script src="js/theme.js?v=33"></script>
+    <script src="js/confetti.js?v=33"></script>
 
-    <script src="js/repaymentEngine.js?v=32"></script>
-    <script src="js/planner.js?v=32"></script>
-    <script src="js/app.js?v=32"></script>
+    <script src="js/repaymentEngine.js?v=33"></script>
+    <script src="js/planner.js?v=33"></script>
+    <script src="js/app.js?v=33"></script>
 
     <script>
         if ("serviceWorker" in navigator) {

@@ -51,6 +51,102 @@ function calculatePlan() {
     runPlan();
 }
 
+function toggleCustomMonthsField() {
+    const isCustom = document.getElementById("targetTimeframe").value === "custom";
+    document.getElementById("customMonthsField").classList.toggle("hidden", !isCustom);
+}
+
+// Works backwards from a target payoff date: binary-searches for the
+// smallest monthly budget that clears every debt within that many
+// months, honouring whichever strategy is currently selected.
+function calculateRequiredBudget() {
+
+    if (debts.length === 0) {
+        alert("Add at least one debt first.");
+        return;
+    }
+
+    const timeframeValue = document.getElementById("targetTimeframe").value;
+    const targetMonths = timeframeValue === "custom"
+        ? Number(document.getElementById("customMonths").value)
+        : Number(timeframeValue);
+
+    if (!targetMonths || targetMonths <= 0) {
+        alert("Enter a valid number of months.");
+        return;
+    }
+
+    const strategy = document.getElementById("strategy").value;
+    const totalMinimums = debts.reduce((sum, d) => sum + getGuaranteedPayment(d), 0);
+    const totalBalance = debts.reduce((sum, d) => sum + Number(d.balance), 0);
+
+    // A generous upper bound that's always enough to clear everything
+    // in a single month, so the search always has a valid range to
+    // work within.
+    const high = (totalBalance + totalMinimums) * 1.5 + 100;
+
+    const bestCase = runRepaymentSimulation(JSON.parse(JSON.stringify(debts)), high, strategy, {});
+    if (bestCase.months > targetMonths) {
+        alert(
+            `Even paying everything off as fast as possible, this would take ${bestCase.months} month${bestCase.months > 1 ? "s" : ""} minimum — ` +
+            `${targetMonths} months isn't reachable for these debts.`
+        );
+        return;
+    }
+
+    let low = totalMinimums;
+    let upper = high;
+
+    for (let i = 0; i < 40; i++) {
+        const mid = (low + upper) / 2;
+        const result = runRepaymentSimulation(JSON.parse(JSON.stringify(debts)), mid, strategy, {});
+        if (result.months <= targetMonths) {
+            upper = mid;
+        } else {
+            low = mid;
+        }
+    }
+
+    // Round up to the nearest penny — rounding down could undershoot
+    // the target by a hair and miss the deadline by a month.
+    const requiredBudget = Math.ceil(upper * 100) / 100;
+
+    renderRequiredBudgetResult(requiredBudget, targetMonths, totalMinimums);
+}
+
+function renderRequiredBudgetResult(requiredBudget, targetMonths, totalMinimums) {
+
+    const extra = Math.max(0, requiredBudget - totalMinimums);
+
+    document.getElementById("requiredBudgetResult").innerHTML = `
+<div class="plan-card">
+    <h3>🎯 To be debt-free in ${targetMonths} month${targetMonths > 1 ? "s" : ""}</h3>
+    <div class="summary-grid">
+        <div class="summary-item">
+            <span>Required Monthly Budget</span>
+            <strong>£${requiredBudget.toFixed(2)}</strong>
+        </div>
+        <div class="summary-item">
+            <span>vs. Minimums Only</span>
+            <strong>+£${extra.toFixed(2)}/mo extra</strong>
+        </div>
+    </div>
+    <button
+        type="button"
+        class="planner-button"
+        style="margin-top:18px;"
+        onclick="useRequiredBudget(${requiredBudget})">
+        Use This Budget →
+    </button>
+</div>`;
+}
+
+function useRequiredBudget(amount) {
+    document.getElementById("monthlyBudget").value = amount.toFixed(2);
+    persistBudgetSettings();
+    calculatePlan();
+}
+
 // Called on every keystroke in the popup's "Extra" input — recalculates
 // the whole plan live using the user's custom payment amounts.
 function updateCustomExtra(lender, rawValue) {
