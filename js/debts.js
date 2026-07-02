@@ -1,13 +1,8 @@
 let debts = [];
-<<<<<<< HEAD
-=======
-
->>>>>>> e860a7a36a52603be878564f556184e8ff06439b
 let editingIndex = null;
 
 function addDebt() {
 
-<<<<<<< HEAD
     const lender = document.getElementById("lender").value;
     const balance = Number(document.getElementById("balance").value);
     const apr = Number(document.getElementById("apr").value);
@@ -55,69 +50,6 @@ function deleteDebt(index) {
     renderDebts();
     updateSummary();
     saveDebts();
-=======
-const lender = document.getElementById("lender").value;
-const balance = Number(document.getElementById("balance").value);
-const apr = Number(document.getElementById("apr").value);
-const limit = Number(document.getElementById("limit").value);
-const minimum = Number(document.getElementById("minimum").value);
-
-    if (!lender || balance <= 0 || apr < 0 || limit <= 0 || minimum <= 0) {
-
-        alert("Please complete every field.");
-
-        return;
-
-    }
-
-    const debt = {
-
-    lender,
-
-    balance,
-
-    apr,
-
-    limit,
-
-    minimum
-
-};
-
-if (editingIndex === null) {
-
-    debts.push(debt);
-
-} else {
-
-    debts[editingIndex] = debt;
-
-    editingIndex = null;
-
-    document.getElementById("addDebtButton").textContent = "Add Debt";
-
-}
-
-saveDebts();
-
-renderDebts();
-
-updateSummary();
-
-clearForm();
-}
-
-function deleteDebt(index) {
-
-    debts.splice(index, 1);
-
-    renderDebts();
-
-    updateSummary();
-
-    saveDebts();
-
->>>>>>> e860a7a36a52603be878564f556184e8ff06439b
 }
 
 function editDebt(index) {
@@ -129,7 +61,6 @@ function editDebt(index) {
     document.getElementById("apr").value = debt.apr;
     document.getElementById("limit").value = debt.limit;
     document.getElementById("minimum").value = debt.minimum;
-<<<<<<< HEAD
     document.getElementById("promoApr").value = (debt.promoApr !== null && debt.promoApr !== undefined) ? debt.promoApr : "";
     document.getElementById("promoEndDate").value = debt.promoEndDate || "";
     document.getElementById("fixedPayment").value = (debt.fixedPayment !== null && debt.fixedPayment !== undefined) ? debt.fixedPayment : "";
@@ -163,10 +94,3 @@ function getEffectiveApr(debt, monthsFromNow = 0) {
 function getGuaranteedPayment(debt) {
     return Math.max(Number(debt.minimum), Number(debt.fixedPayment) || 0);
 }
-=======
-
-    editingIndex = index;
-    document.getElementById("addDebtButton").textContent = "Save Changes";
-
-}
->>>>>>> e860a7a36a52603be878564f556184e8ff06439b

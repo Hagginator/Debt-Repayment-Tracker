@@ -17,7 +17,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Debt Manager">
 
-    <link rel="stylesheet" href="css/style.css?v=20">
+    <link rel="stylesheet" href="css/style.css?v=22">
 
 </head>
 
@@ -214,19 +214,19 @@
 
     </div>
 
-    <script src="js/debts.js?v=20"></script>
-    <script src="js/ui.js?v=20"></script>
-    <script src="js/storage.js?v=20"></script>
-    <script src="js/calculations.js?v=20"></script>
+    <script src="js/debts.js?v=22"></script>
+    <script src="js/ui.js?v=22"></script>
+    <script src="js/storage.js?v=22"></script>
+    <script src="js/calculations.js?v=22"></script>
     
-    <script src="js/repaymentEngine.js?v=20"></script>
-    <script src="js/planner.js?v=20"></script>
-    <script src="js/app.js?v=20"></script>
+    <script src="js/repaymentEngine.js?v=22"></script>
+    <script src="js/planner.js?v=22"></script>
+    <script src="js/app.js?v=22"></script>
 
     <script>
         if ("serviceWorker" in navigator) {
             window.addEventListener("load", () => {
-                navigator.serviceWorker.register("sw.js").catch(err => {
+                navigator.serviceWorker.register("js/sw.js").catch(err => {
                     console.warn("Service worker registration failed:", err);
                 });
             });

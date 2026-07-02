@@ -9,7 +9,7 @@
    to tell if you're looking at the latest code.
 ========================================= */
 
-const CACHE_NAME = "debt-manager-v1";
+const CACHE_NAME = "debt-manager-v3";
 
 const PRECACHE_URLS = [
     "./",
@@ -37,14 +37,21 @@ self.addEventListener("activate", (event) => {
 
 self.addEventListener("fetch", (event) => {
 
-    // Only handle GET requests for same-origin app files.
-    if (event.request.method !== "GET") return;
+    // Only handle same-origin GET requests. Cross-origin requests (like
+    // Google Fonts) are left completely alone and pass through normally —
+    // iOS Safari's service worker implementation is stricter than
+    // desktop browsers about caching cross-origin/opaque responses, and
+    // there's no real benefit to intercepting those here anyway.
+    const isSameOrigin = new URL(event.request.url).origin === self.location.origin;
+    if (event.request.method !== "GET" || !isSameOrigin) return;
 
     event.respondWith(
         fetch(event.request)
             .then((response) => {
                 const copy = response.clone();
-                caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
+                caches.open(CACHE_NAME)
+                    .then((cache) => cache.put(event.request, copy))
+                    .catch(() => {}); // never let a caching failure break the actual page load
                 return response;
             })
             .catch(() => caches.match(event.request))
