@@ -112,23 +112,32 @@ function exitEditMode() {
     document.getElementById("cancelEditButton").classList.add("hidden");
 }
 
+// Whether a promo is configured AND still within its window at a
+// given point in time. Deliberately independent of whether promoApr
+// and apr happen to differ numerically — a card can legitimately have
+// both set to 0%, and it should still count as "on a promo" right up
+// until the end date, not just while the two rates differ.
+function isPromoCurrentlyActive(debt, monthsFromNow = 0) {
+
+    const hasPromo = (debt.promoApr !== null && debt.promoApr !== undefined && debt.promoApr !== "")
+        && !!debt.promoEndDate;
+
+    if (!hasPromo) return false;
+
+    const today = new Date();
+    const checkDate = new Date(today.getFullYear(), today.getMonth() + monthsFromNow, 1);
+    const promoEnd = new Date(debt.promoEndDate);
+
+    return checkDate < promoEnd;
+}
+
 // Returns the APR that actually applies to a debt at a given point in
 // time. monthsFromNow = 0 means "this month"; simulations pass higher
 // offsets to check whether a promo will still be active N months from
 // now. Falls back to the normal APR if no promo is set, or once the
 // promo end date has passed.
 function getEffectiveApr(debt, monthsFromNow = 0) {
-
-    const hasPromo = (debt.promoApr !== null && debt.promoApr !== undefined && debt.promoApr !== "")
-        && !!debt.promoEndDate;
-
-    if (!hasPromo) return Number(debt.apr);
-
-    const today = new Date();
-    const checkDate = new Date(today.getFullYear(), today.getMonth() + monthsFromNow, 1);
-    const promoEnd = new Date(debt.promoEndDate);
-
-    return checkDate < promoEnd ? Number(debt.promoApr) : Number(debt.apr);
+    return isPromoCurrentlyActive(debt, monthsFromNow) ? Number(debt.promoApr) : Number(debt.apr);
 }
 
 // Most real cards require the GREATER of a flat amount or a % of the

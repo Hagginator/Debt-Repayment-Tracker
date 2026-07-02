@@ -30,7 +30,7 @@ function getPromoWarnings() {
     const warningWindowMs = 60 * 24 * 60 * 60 * 1000;
 
     return debts
-        .filter(d => d.balance > 0.01 && d.promoEndDate && getEffectiveApr(d, 0) !== Number(d.apr))
+        .filter(d => d.balance > 0.01 && isPromoCurrentlyActive(d, 0))
         .map(d => {
             const endDate = new Date(d.promoEndDate);
             const daysRemaining = Math.ceil((endDate - now) / (24 * 60 * 60 * 1000));
@@ -74,7 +74,7 @@ function renderDebts() {
     debts.forEach((debt, index) => {
 
         const effectiveApr = getEffectiveApr(debt, 0);
-        const isPromoActive = effectiveApr !== Number(debt.apr);
+        const isPromoActive = isPromoCurrentlyActive(debt, 0);
         const isPriority = debt.lender === priorityLender;
 
         const utilisation = debt.limit > 0 ? (debt.balance / debt.limit) * 100 : 0;
