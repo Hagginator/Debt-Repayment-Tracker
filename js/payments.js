@@ -6,48 +6,63 @@
 // lender name so it survives re-renders.
 let expandedHistoryLenders = new Set();
 
+// Toggles the DOM element directly rather than triggering a full
+// re-render, so the CSS grid-row transition actually has an existing
+// element to animate between states — a fresh re-render would just
+// pop straight to the new state with nothing to transition from.
 function toggleHistory(lender) {
-    if (expandedHistoryLenders.has(lender)) {
+
+    const wasExpanded = expandedHistoryLenders.has(lender);
+    if (wasExpanded) {
         expandedHistoryLenders.delete(lender);
     } else {
         expandedHistoryLenders.add(lender);
     }
-    renderPaymentsTab();
+
+    const section = document.querySelector(`[data-history-for="${CSS.escape(lender)}"]`);
+    if (!section) return;
+
+    const wrapper = section.querySelector(".history-list-wrapper");
+    const toggleBtn = section.querySelector(".history-toggle");
+    const count = wrapper ? wrapper.querySelectorAll(".history-entry").length : 0;
+
+    if (wrapper) wrapper.classList.toggle("expanded", !wasExpanded);
+    if (toggleBtn) toggleBtn.textContent = `📜 ${!wasExpanded ? "Hide" : "Show"} History (${count})`;
 }
 
 function buildHistorySectionHtml(debt) {
 
     const history = debt.history || [];
     const isExpanded = expandedHistoryLenders.has(debt.lender);
+    const lenderEscaped = debt.lender.replace(/'/g, "\\'");
 
     if (history.length === 0) {
-        return `<div class="history-section"><span class="history-empty">No history logged yet</span></div>`;
+        return `<div class="history-section" data-history-for="${debt.lender}"><span class="history-empty">No history logged yet</span></div>`;
     }
 
     const toggleLabel = isExpanded ? "Hide" : "Show";
-    const lenderEscaped = debt.lender.replace(/'/g, "\\'");
 
-    const entries = isExpanded
-        ? `<div class="history-list">${history.map(h => {
-            const dateLabel = new Date(h.date).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
-            const isDown = h.direction === "down";
-            const typeLabel = h.type === "payment" ? "➖ Payment"
-                : h.type === "charge" ? "➕ Charge"
-                : (isDown ? "✏️ Adjusted Down" : "✏️ Adjusted Up");
-            return `
+    const entries = history.map(h => {
+        const dateLabel = new Date(h.date).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
+        const isDown = h.direction === "down";
+        const typeLabel = h.type === "payment" ? "➖ Payment"
+            : h.type === "charge" ? "➕ Charge"
+            : (isDown ? "✏️ Adjusted Down" : "✏️ Adjusted Up");
+        return `
 <div class="history-entry">
     <span class="history-date">${dateLabel}</span>
     <span class="history-type ${h.type}">${typeLabel}</span>
     <span class="history-amount ${isDown ? "payment" : "charge"}">${isDown ? "-" : "+"}£${h.amount.toFixed(2)}</span>
     <span class="history-balance">→ £${h.balanceAfter.toFixed(2)}</span>
 </div>`;
-        }).join("")}</div>`
-        : "";
+    }).join("");
 
     return `
-<div class="history-section">
+<div class="history-section" data-history-for="${debt.lender}">
     <button class="history-toggle" onclick="toggleHistory('${lenderEscaped}')">📜 ${toggleLabel} History (${history.length})</button>
-    ${entries}
+    <div class="history-list-wrapper${isExpanded ? " expanded" : ""}">
+        <div class="history-list">${entries}</div>
+    </div>
 </div>`;
 }
 

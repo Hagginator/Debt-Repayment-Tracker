@@ -32,6 +32,55 @@ function exportData() {
     URL.revokeObjectURL(url);
 }
 
+// A plain spreadsheet-friendly export — one row per debt. Unlike the
+// JSON backup this isn't meant to be re-imported; it's for opening in
+// Excel/Sheets, so it includes the computed effective minimum rather
+// than just the raw stored fields.
+function exportCsv() {
+
+    if (debts.length === 0) {
+        alert("Add at least one debt first.");
+        return;
+    }
+
+    const headers = [
+        "Lender", "Balance", "APR (%)", "Credit Limit", "Minimum Payment",
+        "Minimum %", "Effective Minimum Payment", "Promo APR (%)", "Promo End Date", "Fixed Payment"
+    ];
+
+    const rows = debts.map(d => [
+        d.lender,
+        d.balance.toFixed(2),
+        d.apr,
+        d.limit,
+        d.minimum.toFixed(2),
+        d.minPercent ?? "",
+        getEffectiveMinimum(d).toFixed(2),
+        d.promoApr ?? "",
+        d.promoEndDate ?? "",
+        d.fixedPayment ?? ""
+    ]);
+
+    const escapeCell = (value) => {
+        const str = String(value);
+        return /[",\n]/.test(str) ? `"${str.replace(/"/g, '""')}"` : str;
+    };
+
+    const csvContent = [headers, ...rows]
+        .map(row => row.map(escapeCell).join(","))
+        .join("\r\n");
+
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `debt-manager-export-${new Date().toISOString().slice(0, 10)}.csv`;
+    link.click();
+
+    URL.revokeObjectURL(url);
+}
+
 // Reads a previously exported backup file and, after confirming with
 // the user, replaces whatever's currently stored.
 function importData(event) {

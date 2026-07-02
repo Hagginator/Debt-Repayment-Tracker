@@ -15,11 +15,13 @@ function addDebt() {
     const fixedPaymentRaw = document.getElementById("fixedPayment").value;
 
     if (!lender || balance <= 0 || apr < 0 || limit <= 0 || minimum <= 0) {
+        shakeForm();
         alert("Please complete every field.");
         return;
     }
 
     if (fixedPaymentRaw !== "" && Number(fixedPaymentRaw) < minimum) {
+        shakeForm();
         alert("Fixed payment can't be less than the minimum payment.");
         return;
     }

@@ -21,6 +21,49 @@ function getPriorityLender() {
     return sorted[0].lender;
 }
 
+// Debts with an active 0%-style promo ending within the next 60
+// days, soonest first — the whole point being to catch it before the
+// rate jumps back up, not after.
+function getPromoWarnings() {
+
+    const now = new Date();
+    const warningWindowMs = 60 * 24 * 60 * 60 * 1000;
+
+    return debts
+        .filter(d => d.balance > 0.01 && d.promoEndDate && getEffectiveApr(d, 0) !== Number(d.apr))
+        .map(d => {
+            const endDate = new Date(d.promoEndDate);
+            const daysRemaining = Math.ceil((endDate - now) / (24 * 60 * 60 * 1000));
+            return { lender: d.lender, daysRemaining, endDate, normalApr: d.apr };
+        })
+        .filter(w => w.daysRemaining >= 0 && w.daysRemaining <= 60)
+        .sort((a, b) => a.daysRemaining - b.daysRemaining);
+}
+
+function renderPromoBanner() {
+
+    const container = document.getElementById("promoBanner");
+    if (!container) return;
+
+    const warnings = getPromoWarnings();
+
+    if (warnings.length === 0) {
+        container.innerHTML = "";
+        return;
+    }
+
+    const items = warnings.map(w => {
+        const dateLabel = w.endDate.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
+        const timeLabel = w.daysRemaining === 0 ? "today" : `in ${w.daysRemaining} day${w.daysRemaining > 1 ? "s" : ""}`;
+        return `
+<div class="promo-warning-item">
+    <span>⏰ <strong>${w.lender}</strong>'s promo rate ends ${timeLabel} (${dateLabel}) — jumps to ${w.normalApr}% APR</span>
+</div>`;
+    }).join("");
+
+    container.innerHTML = `<div class="promo-banner">${items}</div>`;
+}
+
 function renderDebts() {
 
     const container = document.getElementById("debts");
@@ -60,7 +103,7 @@ function renderDebts() {
             : `${debt.apr}% APR`;
 
         html += `
-<div class="debt-card${isPriority ? " priority-debt" : ""}">
+<div class="debt-card${isPriority ? " priority-debt" : ""}" style="animation-delay:${Math.min(index, 6) * 60}ms;">
 
     <div class="debt-top">
         <div>
@@ -118,6 +161,17 @@ function renderDebts() {
     container.innerHTML = html;
 
     renderPaymentsTab();
+    renderPromoBanner();
+}
+
+// A quick shake to draw the eye to the add-debt form when validation
+// fails, alongside the alert().
+function shakeForm() {
+    const form = document.querySelector(".add-debt");
+    if (!form) return;
+    form.classList.remove("shake");
+    void form.offsetWidth; // force reflow so re-adding the class retriggers the animation
+    form.classList.add("shake");
 }
 
 function clearForm() {

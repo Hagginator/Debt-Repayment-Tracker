@@ -12,6 +12,13 @@ function animateNumber(elementId, targetValue, format) {
         return;
     }
 
+    const card = el.closest(".card");
+    if (card) {
+        card.classList.remove("card-flash");
+        void card.offsetWidth; // force reflow so re-adding the class retriggers the animation
+        card.classList.add("card-flash");
+    }
+
     const duration = 500;
     const startTime = performance.now();
 

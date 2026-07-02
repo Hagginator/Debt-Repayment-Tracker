@@ -17,7 +17,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Debt Manager">
 
-    <link rel="stylesheet" href="css/style.css?v=35">
+    <link rel="stylesheet" href="css/style.css?v=38">
 
 </head>
 
@@ -71,6 +71,8 @@
         =========================== -->
 
         <div id="tab-dashboard" class="tab-content active">
+
+            <div id="promoBanner"></div>
 
             <div class="summary">
 
@@ -346,6 +348,7 @@
                 <div class="settings-actions">
                     <button class="settings-btn" onclick="exportData()">⬇️ Export Backup</button>
                     <button class="settings-btn" onclick="document.getElementById('importFileInput').click()">⬆️ Import Backup</button>
+                    <button class="settings-btn" onclick="exportCsv()">📊 Export CSV</button>
                 </div>
                 <input type="file" id="importFileInput" accept="application/json" class="hidden" onchange="importData(event)">
             </div>
@@ -363,19 +366,19 @@
     <!-- Full-screen confetti burst, drawn when a debt is fully paid off -->
     <canvas id="confettiCanvas" class="hidden"></canvas>
 
-    <script src="js/debts.js?v=35"></script>
-    <script src="js/ui.js?v=35"></script>
-    <script src="js/storage.js?v=35"></script>
-    <script src="js/calculations.js?v=35"></script>
-    <script src="js/payments.js?v=35"></script>
-    <script src="js/tabs.js?v=35"></script>
-    <script src="js/settings.js?v=35"></script>
-    <script src="js/theme.js?v=35"></script>
-    <script src="js/confetti.js?v=35"></script>
+    <script src="js/debts.js?v=38"></script>
+    <script src="js/ui.js?v=38"></script>
+    <script src="js/storage.js?v=38"></script>
+    <script src="js/calculations.js?v=38"></script>
+    <script src="js/payments.js?v=38"></script>
+    <script src="js/tabs.js?v=38"></script>
+    <script src="js/settings.js?v=38"></script>
+    <script src="js/theme.js?v=38"></script>
+    <script src="js/confetti.js?v=38"></script>
 
-    <script src="js/repaymentEngine.js?v=35"></script>
-    <script src="js/planner.js?v=35"></script>
-    <script src="js/app.js?v=35"></script>
+    <script src="js/repaymentEngine.js?v=38"></script>
+    <script src="js/planner.js?v=38"></script>
+    <script src="js/app.js?v=38"></script>
 
     <script>
         if ("serviceWorker" in navigator) {

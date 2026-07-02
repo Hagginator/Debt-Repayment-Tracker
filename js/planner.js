@@ -389,7 +389,7 @@ function buildTimelineHtml(sim) {
 
     const items = [{ month: 0, label: "Now", isStart: true }, ...milestones];
 
-    const rows = items.map(item => {
+    const rows = items.map((item, i) => {
         const isFinal = !item.isStart && item.month === sim.months;
         const label = item.isStart
             ? item.label
@@ -398,7 +398,7 @@ function buildTimelineHtml(sim) {
                 : `💳 ${item.lender} cleared`;
 
         return `
-<div class="timeline-item${isFinal ? " timeline-final" : ""}">
+<div class="timeline-item${isFinal ? " timeline-final" : ""}" style="animation-delay:${Math.min(i, 8) * 90}ms;">
     <div class="timeline-dot"></div>
     <div class="timeline-content">
         <span class="timeline-month">Month ${item.month}</span>
