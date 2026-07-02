@@ -75,12 +75,25 @@ h3, h4 { font-family:var(--font-display); font-weight:600; letter-spacing:.5px; 
     transition:.25s;
 }
 .settings-button:hover { background:var(--primary); transform:rotate(20deg); }
+.settings-button:active { transform:rotate(20deg) scale(.9); }
 
 /* ===== TABS ===== */
 
-.tabs { display:flex; gap:10px; margin-bottom:35px; flex-wrap:wrap; }
+.tabs { display:flex; gap:10px; margin-bottom:35px; flex-wrap:wrap; position:relative; }
+
+.tabs-indicator {
+    position:absolute;
+    top:0; left:0;
+    border-radius:14px;
+    background:linear-gradient(135deg, var(--primary), var(--accent));
+    box-shadow:0 8px 20px rgba(0,89,79,.35);
+    z-index:0;
+    transition:transform .35s cubic-bezier(.34,1.4,.64,1), width .35s ease, height .35s ease;
+}
 
 .tab-btn {
+    position:relative;
+    z-index:1;
     background:var(--surface);
     border:1px solid var(--border);
     color:var(--muted);
@@ -92,13 +105,19 @@ h3, h4 { font-family:var(--font-display); font-weight:600; letter-spacing:.5px; 
     font-weight:600;
     font-size:.95rem;
     cursor:pointer;
-    transition:.2s;
+    transition:color .2s, border-color .2s, transform .15s;
 }
 .tab-btn:hover { color:var(--text); border-color:var(--accent); }
-.tab-btn.active { background:var(--primary); color:var(--text); border-color:var(--primary); }
+.tab-btn:active { transform:scale(.95); }
+.tab-btn.active { background:transparent; color:var(--text); border-color:transparent; }
 
 .tab-content { display:none; }
-.tab-content.active { display:block; }
+.tab-content.active { display:block; animation:tabFadeIn .35s ease; }
+
+@keyframes tabFadeIn {
+    from { opacity:0; transform:translateY(10px); }
+    to { opacity:1; transform:translateY(0); }
+}
 
 /* ===== DASHBOARD ===== */
 
@@ -168,7 +187,12 @@ h3, h4 { font-family:var(--font-display); font-weight:600; letter-spacing:.5px; 
 }
 .debt-card:hover { transform:translateY(-6px); box-shadow:0 25px 55px rgba(0,0,0,.5); }
 
-.priority-debt { box-shadow:0 0 0 2px var(--accent), var(--shadow); }
+.priority-debt { animation:priorityPulse 2.4s ease-in-out infinite; }
+
+@keyframes priorityPulse {
+    0%, 100% { box-shadow:0 0 0 2px var(--accent), var(--shadow); }
+    50% { box-shadow:0 0 0 5px rgba(196,240,0,.35), var(--shadow); }
+}
 
 .priority-badge {
     display:inline-block;
@@ -200,6 +224,7 @@ h3, h4 { font-family:var(--font-display); font-weight:600; letter-spacing:.5px; 
 }
 .edit-btn { background:rgba(0,89,79,.25); color:#4DD8C4; }
 .edit-btn:hover { background:var(--primary); color:var(--text); }
+.edit-btn:active, .delete-btn:active { transform:scale(.9); }
 .delete-btn { background:rgba(225,6,0,.15); color:#FF6B5E; }
 .delete-btn:hover { background:var(--danger); color:var(--text); }
 
@@ -287,6 +312,7 @@ h3, h4 { font-family:var(--font-display); font-weight:600; letter-spacing:.5px; 
     transition:.25s;
 }
 .planner-button:hover { transform:translateY(-3px); box-shadow:0 15px 35px rgba(196,240,0,.3); }
+.planner-button:active { transform:translateY(-1px) scale(.97); }
 
 /* ===== PAYMENT RESULTS ===== */
 
@@ -328,6 +354,7 @@ h3, h4 { font-family:var(--font-display); font-weight:600; letter-spacing:.5px; 
     transition:.2s;
 }
 .plan-row-compact:hover { border-color:var(--accent); transform:translateX(4px); }
+.plan-row-compact:active { transform:translateX(4px) scale(.98); }
 
 .plan-row-main { display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
 .plan-row-name { font-family:var(--font-display); font-weight:600; letter-spacing:.3px; }
@@ -344,8 +371,14 @@ h3, h4 { font-family:var(--font-display); font-weight:600; letter-spacing:.5px; 
     justify-content:center;
     padding:20px;
     z-index:1000;
+    animation:overlayFadeIn .2s ease;
 }
 .modal-overlay.hidden { display:none; }
+
+@keyframes overlayFadeIn {
+    from { opacity:0; }
+    to { opacity:1; }
+}
 
 .modal {
     position:relative;
@@ -356,7 +389,12 @@ h3, h4 { font-family:var(--font-display); font-weight:600; letter-spacing:.5px; 
     border-radius:22px;
     padding:30px;
     box-shadow:var(--shadow);
-    animation:cardFade .25s ease;
+    animation:modalPopIn .3s cubic-bezier(.34,1.56,.64,1);
+}
+
+@keyframes modalPopIn {
+    from { opacity:0; transform:translateY(16px) scale(.96); }
+    to { opacity:1; transform:translateY(0) scale(1); }
 }
 
 .modal-close {
@@ -397,6 +435,7 @@ h3, h4 { font-family:var(--font-display); font-weight:600; letter-spacing:.5px; 
     transition:.2s;
 }
 .settings-btn:hover { border-color:var(--accent); color:var(--accent); }
+.settings-btn:active { transform:scale(.96); }
 .settings-btn.danger { color:#FF6B5E; }
 .settings-btn.danger:hover { border-color:var(--danger); background:rgba(225,6,0,.12); color:var(--danger); }
 
@@ -560,6 +599,7 @@ h3, h4 { font-family:var(--font-display); font-weight:600; letter-spacing:.5px; 
     transition:.2s;
 }
 .log-payment-btn:hover { background:var(--accent); color:var(--bg); }
+.log-payment-btn:active { transform:scale(.96); }
 
 /* ===== ADD DEBT FORM ===== */
 
@@ -598,6 +638,7 @@ h3, h4 { font-family:var(--font-display); font-weight:600; letter-spacing:.5px; 
     transition:.2s;
 }
 #addDebtButton:hover { background:var(--accent); color:var(--bg); }
+#addDebtButton:active { transform:scale(.96); }
 
 #cancelEditButton {
     background:none;

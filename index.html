@@ -17,7 +17,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Debt Manager">
 
-    <link rel="stylesheet" href="css/style.css?v=28">
+    <link rel="stylesheet" href="css/style.css?v=29">
 
 </head>
 
@@ -60,6 +60,7 @@
         =========================== -->
 
         <div class="tabs">
+            <div class="tabs-indicator" id="tabsIndicator"></div>
             <button class="tab-btn active" data-tab="dashboard" onclick="switchTab('dashboard')">📊 Dashboard</button>
             <button class="tab-btn" data-tab="payments" onclick="switchTab('payments')">💷 Log Payment</button>
             <button class="tab-btn" data-tab="planner" onclick="switchTab('planner')">🗺️ Planner</button>
@@ -293,18 +294,18 @@
     <!-- Full-screen confetti burst, drawn when a debt is fully paid off -->
     <canvas id="confettiCanvas" class="hidden"></canvas>
 
-    <script src="js/debts.js?v=28"></script>
-    <script src="js/ui.js?v=28"></script>
-    <script src="js/storage.js?v=28"></script>
-    <script src="js/calculations.js?v=28"></script>
-    <script src="js/payments.js?v=28"></script>
-    <script src="js/tabs.js?v=28"></script>
-    <script src="js/settings.js?v=28"></script>
-    <script src="js/confetti.js?v=28"></script>
+    <script src="js/debts.js?v=29"></script>
+    <script src="js/ui.js?v=29"></script>
+    <script src="js/storage.js?v=29"></script>
+    <script src="js/calculations.js?v=29"></script>
+    <script src="js/payments.js?v=29"></script>
+    <script src="js/tabs.js?v=29"></script>
+    <script src="js/settings.js?v=29"></script>
+    <script src="js/confetti.js?v=29"></script>
 
-    <script src="js/repaymentEngine.js?v=28"></script>
-    <script src="js/planner.js?v=28"></script>
-    <script src="js/app.js?v=28"></script>
+    <script src="js/repaymentEngine.js?v=29"></script>
+    <script src="js/planner.js?v=29"></script>
+    <script src="js/app.js?v=29"></script>
 
     <script>
         if ("serviceWorker" in navigator) {

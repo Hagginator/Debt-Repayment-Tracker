@@ -1,3 +1,32 @@
+// Animates a summary card's number counting up/down from whatever it
+// currently displays to the new value, rather than just snapping to it.
+function animateNumber(elementId, targetValue, format) {
+
+    const el = document.getElementById(elementId);
+    if (!el) return;
+
+    const startValue = parseFloat(el.textContent.replace(/[^0-9.-]/g, "")) || 0;
+
+    if (Math.abs(targetValue - startValue) < 0.01) {
+        el.textContent = format(targetValue);
+        return;
+    }
+
+    const duration = 500;
+    const startTime = performance.now();
+
+    function frame(now) {
+        const progress = Math.min((now - startTime) / duration, 1);
+        const eased = 1 - Math.pow(1 - progress, 3); // ease-out cubic
+        el.textContent = format(startValue + (targetValue - startValue) * eased);
+
+        if (progress < 1) requestAnimationFrame(frame);
+        else el.textContent = format(targetValue);
+    }
+
+    requestAnimationFrame(frame);
+}
+
 function updateSummary() {
 
     let totalDebt = 0;
@@ -16,11 +45,11 @@ function updateSummary() {
         ? (totalDebt / totalCreditLimit) * 100
         : 0;
 
-    document.getElementById("totalDebt").textContent = "£" + totalDebt.toFixed(2);
-    document.getElementById("monthlyInterest").textContent = "£" + totalMonthlyInterest.toFixed(2);
-    document.getElementById("creditLimit").textContent = "£" + totalCreditLimit.toFixed(2);
-    document.getElementById("utilisation").textContent = utilisation.toFixed(1) + "%";
-    document.getElementById("minimumPayments").textContent = "£" + totalMinimumPayments.toFixed(2);
+    animateNumber("totalDebt", totalDebt, v => "£" + v.toFixed(2));
+    animateNumber("monthlyInterest", totalMonthlyInterest, v => "£" + v.toFixed(2));
+    animateNumber("creditLimit", totalCreditLimit, v => "£" + v.toFixed(2));
+    animateNumber("utilisation", utilisation, v => v.toFixed(1) + "%");
+    animateNumber("minimumPayments", totalMinimumPayments, v => "£" + v.toFixed(2));
 
     if (debts.length === 0) {
         document.getElementById("debtFree").textContent = "--";
