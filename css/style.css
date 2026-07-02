@@ -706,6 +706,53 @@ h3, h4 { font-family:var(--font-display); font-weight:600; letter-spacing:.5px; 
 .log-charge-btn:hover { background:var(--danger); border-color:var(--danger); color:var(--text); }
 .log-charge-btn:active { transform:scale(.96); }
 
+/* ===== PAYMENT HISTORY ===== */
+
+.history-section {
+    flex-basis:100%;
+    align-self:stretch;
+    margin-top:6px;
+    padding-top:14px;
+    border-top:1px solid var(--border);
+}
+
+.history-empty { color:var(--muted); font-size:.85rem; }
+
+.history-toggle {
+    background:none;
+    border:none;
+    color:var(--muted);
+    font-family:var(--font-display);
+    text-transform:uppercase;
+    letter-spacing:.5px;
+    font-size:.8rem;
+    font-weight:600;
+    cursor:pointer;
+    padding:0;
+    transition:.2s;
+}
+.history-toggle:hover { color:var(--accent); }
+
+.history-list { display:flex; flex-direction:column; gap:8px; margin-top:14px; }
+
+.history-entry {
+    display:flex;
+    align-items:center;
+    gap:14px;
+    flex-wrap:wrap;
+    background:rgba(255,255,255,.03);
+    border-radius:10px;
+    padding:10px 14px;
+    font-size:.85rem;
+}
+
+.history-date { color:var(--muted); font-family:var(--font-mono); min-width:90px; }
+.history-type { font-family:var(--font-display); font-weight:600; letter-spacing:.3px; }
+.history-amount { font-family:var(--font-mono); font-weight:700; }
+.history-amount.payment { color:#4CD787; }
+.history-amount.charge { color:#FF6B5E; }
+.history-balance { color:var(--muted); font-family:var(--font-mono); margin-left:auto; }
+
 /* ===== ADD DEBT FORM ===== */
 
 .add-debt {

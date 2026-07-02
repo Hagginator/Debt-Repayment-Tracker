@@ -34,8 +34,20 @@ function addDebt() {
     const debt = { lender, balance, apr, limit, minimum, minPercent, promoApr, promoEndDate, fixedPayment };
 
     if (editingIndex === null) {
+        debt.history = [];
         debts.push(debt);
     } else {
+        const existing = debts[editingIndex];
+        debt.history = existing.history || [];
+
+        // If the balance was changed by hand (rather than via Log
+        // Payment/Charge), record it too — otherwise the history trail
+        // would silently disagree with the debt's actual balance.
+        const delta = balance - existing.balance;
+        if (Math.abs(delta) > 0.005) {
+            recordHistory(debt, "adjustment", delta > 0 ? "up" : "down", Math.abs(delta));
+        }
+
         debts[editingIndex] = debt;
     }
 
