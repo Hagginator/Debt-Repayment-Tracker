@@ -40,6 +40,55 @@ function getPurchaseAdvice(amount) {
     return { status: "ok", amount, best, monthlyInterestCost };
 }
 
+// Tiered by amount, mildest first — each tier has a few opening lines
+// so it doesn't say the exact same thing every time. The actual card
+// recommendation underneath is always the same accurate calculation;
+// only the tone of the opener changes.
+const PURCHASE_ADVICE_TIERS = [
+    {
+        max: 100,
+        openers: [
+            "Honestly? £{amount} isn't going to break anything.",
+            "A bit silly, but fine — £{amount} won't derail much.",
+            "Look, £{amount} is hardly the crime of the century.",
+            "£{amount}? Go ahead, it's not exactly a big deal."
+        ]
+    },
+    {
+        max: 300,
+        openers: [
+            "That's not nothing — £{amount} is worth a second thought.",
+            "£{amount} while you're paying down debt is a bit cheeky, but okay.",
+            "I'd think twice about £{amount}, but it's not the end of the world.",
+            "£{amount} isn't ideal, but it won't wreck your plan on its own."
+        ]
+    },
+    {
+        max: 700,
+        openers: [
+            "£{amount}? That's a real dent — I'd sit on this one.",
+            "Genuinely, £{amount} is a lot to add right now.",
+            "£{amount} is the kind of purchase that undoes weeks of progress.",
+            "I wouldn't. £{amount} is a significant step backwards."
+        ]
+    },
+    {
+        max: Infinity,
+        openers: [
+            "Absolutely not. £{amount} is a genuinely bad idea right now.",
+            "No — £{amount} would seriously set you back.",
+            "£{amount}? That's a hard no from me.",
+            "Please don't. £{amount} is real money you're already short on."
+        ]
+    }
+];
+
+function pickPurchaseOpener(amount) {
+    const tier = PURCHASE_ADVICE_TIERS.find(t => amount <= t.max);
+    const template = tier.openers[Math.floor(Math.random() * tier.openers.length)];
+    return template.replace("{amount}", amount.toFixed(2));
+}
+
 function renderPurchaseAdvice() {
 
     const amount = Number(document.getElementById("purchaseAmount").value);
@@ -70,7 +119,7 @@ function renderPurchaseAdvice() {
 
     container.innerHTML = `
 <p class="advisor-result">
-    Honestly, adding £${amount.toFixed(2)} of new spending while you're paying down debt isn't a great idea.
+    ${pickPurchaseOpener(amount)}
     But if you're going to, put it on <strong>${best.debt.lender}</strong> — ${reason}.
     ${best.hasPromo ? "" : `Left unpaid, that's roughly <strong>£${monthlyInterestCost.toFixed(2)}/month</strong> in extra interest.`}
 </p>`;
