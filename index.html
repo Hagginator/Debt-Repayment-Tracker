@@ -17,7 +17,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Debt Manager">
 
-    <link rel="stylesheet" href="css/style.css?v=39">
+    <link rel="stylesheet" href="css/style.css?v=41">
 
 </head>
 
@@ -34,7 +34,8 @@
             <div class="header-left">
 
                 <div class="logo">
-                    🏁
+                    <span class="ico">🏁</span>
+                    <span class="logo-text">DM</span>
                 </div>
 
                 <div>
@@ -61,9 +62,9 @@
 
         <div class="tabs">
             <div class="tabs-indicator" id="tabsIndicator"></div>
-            <button class="tab-btn active" data-tab="dashboard" onclick="switchTab('dashboard')">📊 Dashboard</button>
-            <button class="tab-btn" data-tab="payments" onclick="switchTab('payments')">💷 Log Payment</button>
-            <button class="tab-btn" data-tab="planner" onclick="switchTab('planner')">🗺️ Planner</button>
+            <button class="tab-btn active" data-tab="dashboard" onclick="switchTab('dashboard')"><span class="ico">📊</span> Dashboard</button>
+            <button class="tab-btn" data-tab="payments" onclick="switchTab('payments')"><span class="ico">💷</span> Log Payment</button>
+            <button class="tab-btn" data-tab="planner" onclick="switchTab('planner')"><span class="ico">🗺️</span> Planner</button>
         </div>
 
         <!-- ==========================
@@ -308,10 +309,35 @@
     <div id="settingsModal" class="modal-overlay hidden" onclick="if (event.target === this) closeSettingsModal()">
         <div class="modal">
             <button class="modal-close" onclick="closeSettingsModal()">✕</button>
-            <h3 style="margin-bottom:20px;">⚙️ Settings</h3>
+            <h3 style="margin-bottom:20px;"><span class="ico">⚙️</span> Settings</h3>
 
             <div class="settings-section">
-                <h4>Theme</h4>
+                <h4>Layout</h4>
+                <p class="settings-hint">
+                    Pick the overall look and feel — everything else (colour, cards, planner, etc.) stays the same underneath.
+                </p>
+                <div class="layout-options">
+                    <button class="layout-option active" data-layout="classic" onclick="selectLayout('classic')">
+                        <span class="layout-option-name">Classic</span>
+                        <span class="layout-option-desc">The original bold, rounded, game-y look</span>
+                    </button>
+                    <button class="layout-option" data-layout="modern" onclick="selectLayout('modern')">
+                        <span class="layout-option-name">Modern Fintech</span>
+                        <span class="layout-option-desc">Clean sans-serif, soft shadows, breathing room</span>
+                    </button>
+                    <button class="layout-option" data-layout="corporate" onclick="selectLayout('corporate')">
+                        <span class="layout-option-name">Corporate</span>
+                        <span class="layout-option-desc">Structured, conservative, minimal colour</span>
+                    </button>
+                    <button class="layout-option" data-layout="terminal" onclick="selectLayout('terminal')">
+                        <span class="layout-option-name">Analyst Terminal</span>
+                        <span class="layout-option-desc">Dense, monospace, high-contrast dark</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <h4>Colour</h4>
                 <p class="settings-hint">
                     Pick a background colour — surfaces, text and accents are all derived from it automatically.
                 </p>
@@ -366,19 +392,20 @@
     <!-- Full-screen confetti burst, drawn when a debt is fully paid off -->
     <canvas id="confettiCanvas" class="hidden"></canvas>
 
-    <script src="js/debts.js?v=39"></script>
-    <script src="js/ui.js?v=39"></script>
-    <script src="js/storage.js?v=39"></script>
-    <script src="js/calculations.js?v=39"></script>
-    <script src="js/payments.js?v=39"></script>
-    <script src="js/tabs.js?v=39"></script>
-    <script src="js/settings.js?v=39"></script>
-    <script src="js/theme.js?v=39"></script>
-    <script src="js/confetti.js?v=39"></script>
+    <script src="js/debts.js?v=41"></script>
+    <script src="js/ui.js?v=41"></script>
+    <script src="js/storage.js?v=41"></script>
+    <script src="js/calculations.js?v=41"></script>
+    <script src="js/payments.js?v=41"></script>
+    <script src="js/tabs.js?v=41"></script>
+    <script src="js/settings.js?v=41"></script>
+    <script src="js/theme.js?v=41"></script>
+    <script src="js/layout.js?v=41"></script>
+    <script src="js/confetti.js?v=41"></script>
 
-    <script src="js/repaymentEngine.js?v=39"></script>
-    <script src="js/planner.js?v=39"></script>
-    <script src="js/app.js?v=39"></script>
+    <script src="js/repaymentEngine.js?v=41"></script>
+    <script src="js/planner.js?v=41"></script>
+    <script src="js/app.js?v=41"></script>
 
     <script>
         if ("serviceWorker" in navigator) {

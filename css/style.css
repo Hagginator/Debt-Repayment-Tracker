@@ -7,7 +7,7 @@
    Theme: Aston Martin Racing Green
 ========================================= */
 
-@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap');
 
 :root {
     --bg:#081512;
@@ -68,6 +68,8 @@ h3, h4 { font-family:var(--font-display); font-weight:600; letter-spacing:.5px; 
     background:linear-gradient(135deg, var(--primary), var(--accent));
     box-shadow:0 15px 35px rgba(0,89,79,.45);
 }
+
+.logo-text { display:none; font-family:var(--font-display); font-weight:700; color:var(--accent-contrast); font-size:1.3rem; }
 
 .settings-button {
     width:56px; height:56px;
@@ -158,6 +160,17 @@ h3, h4 { font-family:var(--font-display); font-weight:600; letter-spacing:.5px; 
     transition:.25s;
 }
 .card:hover { transform:translateY(-5px); }
+
+.summary .card {
+    opacity:0;
+    animation:cardFade .4s ease forwards;
+}
+.summary .card:nth-child(1) { animation-delay:0ms; }
+.summary .card:nth-child(2) { animation-delay:60ms; }
+.summary .card:nth-child(3) { animation-delay:120ms; }
+.summary .card:nth-child(4) { animation-delay:180ms; }
+.summary .card:nth-child(5) { animation-delay:240ms; }
+.summary .card:nth-child(6) { animation-delay:300ms; }
 
 .card-flash { animation:cardHighlightFlash .8s ease; }
 
@@ -553,6 +566,33 @@ h3, h4 { font-family:var(--font-display); font-weight:600; letter-spacing:.5px; 
 .theme-swatch:hover { transform:scale(1.18); border-color:var(--text); }
 .theme-swatch:active { transform:scale(.95); }
 
+/* ===== LAYOUT PICKER ===== */
+
+.layout-options {
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(140px, 1fr));
+    gap:10px;
+}
+
+.layout-option {
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+    text-align:left;
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:14px 16px;
+    cursor:pointer;
+    transition:.2s;
+}
+.layout-option:hover { border-color:var(--accent); }
+.layout-option:active { transform:scale(.97); }
+.layout-option.active { border-color:var(--accent); background:var(--surface-light); box-shadow:0 0 0 2px rgba(var(--accent-rgb),.3); }
+
+.layout-option-name { font-family:var(--font-display); font-weight:700; font-size:.9rem; }
+.layout-option-desc { color:var(--muted); font-size:.75rem; line-height:1.4; }
+
 .plan-grid {
     display:grid;
     grid-template-columns:repeat(2,1fr);
@@ -885,4 +925,244 @@ h3, h4 { font-family:var(--font-display); font-weight:600; letter-spacing:.5px; 
     .payment-row-action { flex-direction:column; align-items:stretch; }
     .payment-input { width:100%; }
     .plan-row-compact { flex-direction:column; align-items:flex-start; }
+}
+
+/* =========================================
+   LAYOUT THEMES
+   Classic (the original design) needs no
+   block — it's just the base stylesheet
+   above, untouched. Each theme below only
+   overrides shape/typography/density; colour
+   still comes from theme.js independently.
+========================================= */
+
+/* ===== MODERN FINTECH ===== */
+/* Clean sans-serif, soft shadows, generous
+   breathing room — Stripe/Linear/Monzo. */
+
+html[data-layout="modern"] { --radius:16px; }
+
+html[data-layout="modern"] body,
+html[data-layout="modern"] h1, html[data-layout="modern"] h2, html[data-layout="modern"] h3, html[data-layout="modern"] h4,
+html[data-layout="modern"] .tab-btn, html[data-layout="modern"] label,
+html[data-layout="modern"] .planner label, html[data-layout="modern"] .reverse-planner-field label,
+html[data-layout="modern"] .card h2, html[data-layout="modern"] .debt-numbers span,
+html[data-layout="modern"] .plan-stat span, html[data-layout="modern"] .summary-item span,
+html[data-layout="modern"] .history-type, html[data-layout="modern"] .plan-status,
+html[data-layout="modern"] .priority-badge, html[data-layout="modern"] .layout-option-name,
+html[data-layout="modern"] .settings-section h4,
+html[data-layout="modern"] .planner-button, html[data-layout="modern"] .settings-btn,
+html[data-layout="modern"] .theme-hex-input, html[data-layout="modern"] .log-payment-btn,
+html[data-layout="modern"] .log-charge-btn, html[data-layout="modern"] .history-toggle,
+html[data-layout="modern"] #addDebtButton, html[data-layout="modern"] #cancelEditButton {
+    font-family:'Inter', Arial, sans-serif;
+    text-transform:none;
+    letter-spacing:normal;
+}
+
+html[data-layout="modern"] h1 { font-weight:700; letter-spacing:-.5px; }
+html[data-layout="modern"] h2 { font-weight:600; font-size:1.05rem; }
+html[data-layout="modern"] .card h2 { font-weight:600; }
+
+html[data-layout="modern"] .card, html[data-layout="modern"] .debt-card,
+html[data-layout="modern"] .plan-card, html[data-layout="modern"] .modal,
+html[data-layout="modern"] .promo-banner {
+    border-radius:16px;
+    box-shadow:0 4px 24px rgba(0,0,0,.16);
+}
+html[data-layout="modern"] .debt-card { border-top:1px solid var(--border); }
+
+html[data-layout="modern"] .plan-row-compact, html[data-layout="modern"] .payment-row,
+html[data-layout="modern"] .history-entry, html[data-layout="modern"] .plan-stat,
+html[data-layout="modern"] .summary-item, html[data-layout="modern"] .reverse-planner {
+    border-radius:12px;
+}
+
+html[data-layout="modern"] .tab-btn, html[data-layout="modern"] .tabs-indicator { border-radius:10px; }
+
+html[data-layout="modern"] .add-debt input, html[data-layout="modern"] .planner input,
+html[data-layout="modern"] .planner select, html[data-layout="modern"] .payment-input,
+html[data-layout="modern"] .reverse-planner-field select, html[data-layout="modern"] .reverse-planner-field input,
+html[data-layout="modern"] .theme-hex-input {
+    border-radius:10px;
+}
+
+html[data-layout="modern"] #addDebtButton, html[data-layout="modern"] .planner-button,
+html[data-layout="modern"] .log-payment-btn, html[data-layout="modern"] .log-charge-btn,
+html[data-layout="modern"] .settings-btn, html[data-layout="modern"] #cancelEditButton,
+html[data-layout="modern"] .layout-option {
+    border-radius:10px;
+    font-weight:600;
+}
+
+html[data-layout="modern"] .planner-button { box-shadow:0 4px 16px rgba(var(--accent-rgb),.25); }
+html[data-layout="modern"] .planner-button:hover { box-shadow:0 8px 22px rgba(var(--accent-rgb),.3); }
+
+html[data-layout="modern"] .priority-debt { animation:cardFade .35s ease; box-shadow:0 4px 24px rgba(0,0,0,.16), 0 0 0 1px var(--accent); }
+html[data-layout="modern"] .priority-badge { border-radius:8px; font-weight:600; }
+
+html[data-layout="modern"] .ico { display:none; }
+html[data-layout="modern"] .logo-text { display:block; }
+
+/* ===== CORPORATE ===== */
+/* Structured, conservative, minimal colour —
+   a traditional bank portal. */
+
+html[data-layout="corporate"] { --radius:6px; }
+
+html[data-layout="corporate"] body,
+html[data-layout="corporate"] h1, html[data-layout="corporate"] h2, html[data-layout="corporate"] h3, html[data-layout="corporate"] h4,
+html[data-layout="corporate"] .tab-btn, html[data-layout="corporate"] label,
+html[data-layout="corporate"] .planner label, html[data-layout="corporate"] .reverse-planner-field label,
+html[data-layout="corporate"] .card h2, html[data-layout="corporate"] .debt-numbers span,
+html[data-layout="corporate"] .plan-stat span, html[data-layout="corporate"] .summary-item span,
+html[data-layout="corporate"] .history-type, html[data-layout="corporate"] .plan-status,
+html[data-layout="corporate"] .priority-badge, html[data-layout="corporate"] .layout-option-name,
+html[data-layout="corporate"] .settings-section h4,
+html[data-layout="corporate"] .planner-button, html[data-layout="corporate"] .settings-btn,
+html[data-layout="corporate"] .theme-hex-input, html[data-layout="corporate"] .log-payment-btn,
+html[data-layout="corporate"] .log-charge-btn, html[data-layout="corporate"] .history-toggle,
+html[data-layout="corporate"] #addDebtButton, html[data-layout="corporate"] #cancelEditButton {
+    font-family:'Inter', Arial, sans-serif;
+    text-transform:none;
+    letter-spacing:normal;
+    font-weight:600;
+}
+
+html[data-layout="corporate"] .card, html[data-layout="corporate"] .debt-card,
+html[data-layout="corporate"] .plan-card, html[data-layout="corporate"] .modal,
+html[data-layout="corporate"] .promo-banner {
+    border-radius:6px;
+    box-shadow:none;
+    border:1px solid var(--border);
+    background:var(--surface);
+}
+html[data-layout="corporate"] .debt-card { border-top:1px solid var(--border); }
+html[data-layout="corporate"] .card:hover, html[data-layout="corporate"] .debt-card:hover { transform:none; }
+
+html[data-layout="corporate"] .plan-row-compact, html[data-layout="corporate"] .payment-row,
+html[data-layout="corporate"] .history-entry, html[data-layout="corporate"] .plan-stat,
+html[data-layout="corporate"] .summary-item, html[data-layout="corporate"] .reverse-planner {
+    border-radius:4px;
+}
+html[data-layout="corporate"] .plan-row-compact:hover { transform:none; border-color:var(--accent); }
+
+html[data-layout="corporate"] .tab-btn, html[data-layout="corporate"] .tabs-indicator { border-radius:4px; }
+html[data-layout="corporate"] .tabs-indicator { background:var(--primary); }
+
+html[data-layout="corporate"] .add-debt input, html[data-layout="corporate"] .planner input,
+html[data-layout="corporate"] .planner select, html[data-layout="corporate"] .payment-input,
+html[data-layout="corporate"] .reverse-planner-field select, html[data-layout="corporate"] .reverse-planner-field input,
+html[data-layout="corporate"] .theme-hex-input {
+    border-radius:4px;
+}
+
+html[data-layout="corporate"] #addDebtButton, html[data-layout="corporate"] .planner-button,
+html[data-layout="corporate"] .log-payment-btn, html[data-layout="corporate"] .settings-btn,
+html[data-layout="corporate"] #cancelEditButton, html[data-layout="corporate"] .layout-option {
+    border-radius:4px;
+    font-weight:600;
+}
+html[data-layout="corporate"] .planner-button { background:var(--primary); box-shadow:none; }
+html[data-layout="corporate"] .planner-button:hover { transform:none; box-shadow:none; background:var(--primary-hover); }
+html[data-layout="corporate"] .log-charge-btn { border-radius:4px; }
+
+html[data-layout="corporate"] .priority-debt { animation:cardFade .35s ease; box-shadow:none; border-left:3px solid var(--accent); border-top:1px solid var(--border); }
+html[data-layout="corporate"] .priority-badge { border-radius:3px; background:var(--primary); color:var(--text); font-weight:600; }
+
+html[data-layout="corporate"] .logo { border-radius:6px; }
+html[data-layout="corporate"] .settings-button { border-radius:6px; }
+html[data-layout="corporate"] .modal-close { border-radius:4px; }
+
+html[data-layout="corporate"] .ico { display:none; }
+html[data-layout="corporate"] .logo-text { display:block; }
+
+/* ===== ANALYST TERMINAL ===== */
+/* Dense, monospace-heavy, high-contrast dark
+   — a trading platform, not a consumer app. */
+
+html[data-layout="terminal"] { --radius:2px; }
+
+html[data-layout="terminal"] body,
+html[data-layout="terminal"] h1, html[data-layout="terminal"] h2, html[data-layout="terminal"] h3, html[data-layout="terminal"] h4,
+html[data-layout="terminal"] .tab-btn, html[data-layout="terminal"] label,
+html[data-layout="terminal"] .planner label, html[data-layout="terminal"] .reverse-planner-field label,
+html[data-layout="terminal"] .card h2, html[data-layout="terminal"] .debt-numbers span,
+html[data-layout="terminal"] .plan-stat span, html[data-layout="terminal"] .summary-item span,
+html[data-layout="terminal"] .history-type, html[data-layout="terminal"] .plan-status,
+html[data-layout="terminal"] .priority-badge, html[data-layout="terminal"] .layout-option-name,
+html[data-layout="terminal"] .settings-section h4, html[data-layout="terminal"] input,
+html[data-layout="terminal"] select, html[data-layout="terminal"] button {
+    font-family:'JetBrains Mono', 'Courier New', monospace;
+}
+
+html[data-layout="terminal"] .card, html[data-layout="terminal"] .debt-card,
+html[data-layout="terminal"] .plan-card, html[data-layout="terminal"] .modal,
+html[data-layout="terminal"] .promo-banner {
+    border-radius:2px;
+    box-shadow:none;
+    border:1px solid var(--border);
+    background:var(--bg);
+    padding:18px;
+}
+html[data-layout="terminal"] .debt-card { padding:18px; border-top:1px solid var(--accent); }
+html[data-layout="terminal"] .card:hover, html[data-layout="terminal"] .debt-card:hover { transform:none; }
+
+html[data-layout="terminal"] .plan-row-compact, html[data-layout="terminal"] .payment-row,
+html[data-layout="terminal"] .history-entry, html[data-layout="terminal"] .plan-stat,
+html[data-layout="terminal"] .summary-item, html[data-layout="terminal"] .reverse-planner {
+    border-radius:2px;
+    padding:12px 14px;
+}
+html[data-layout="terminal"] .plan-row-compact:hover { transform:none; }
+
+html[data-layout="terminal"] .tab-btn, html[data-layout="terminal"] .tabs-indicator { border-radius:2px; }
+html[data-layout="terminal"] .tabs-indicator { background:var(--accent); }
+html[data-layout="terminal"] .tab-btn.active { color:var(--accent-contrast); }
+
+html[data-layout="terminal"] .add-debt input, html[data-layout="terminal"] .planner input,
+html[data-layout="terminal"] .planner select, html[data-layout="terminal"] .payment-input,
+html[data-layout="terminal"] .reverse-planner-field select, html[data-layout="terminal"] .reverse-planner-field input,
+html[data-layout="terminal"] .theme-hex-input {
+    border-radius:2px;
+}
+
+html[data-layout="terminal"] #addDebtButton, html[data-layout="terminal"] .planner-button,
+html[data-layout="terminal"] .log-payment-btn, html[data-layout="terminal"] .log-charge-btn,
+html[data-layout="terminal"] .settings-btn, html[data-layout="terminal"] #cancelEditButton,
+html[data-layout="terminal"] .layout-option {
+    border-radius:2px;
+}
+html[data-layout="terminal"] .planner-button { box-shadow:none; }
+html[data-layout="terminal"] .planner-button:hover { transform:none; box-shadow:none; }
+
+html[data-layout="terminal"] .priority-debt { animation:cardFade .35s ease; box-shadow:none; outline:1px solid var(--accent); outline-offset:-1px; }
+html[data-layout="terminal"] .priority-badge { border-radius:2px; }
+
+html[data-layout="terminal"] .logo, html[data-layout="terminal"] .settings-button, html[data-layout="terminal"] .modal-close { border-radius:2px; }
+
+html[data-layout="terminal"] .ico { display:none; }
+html[data-layout="terminal"] .logo-text { display:block; }
+
+/* =========================================
+   THEME-SWITCH TRANSITIONS
+   Placed last so it wins the cascade over
+   the component-specific `transition:` rules
+   above (same specificity, later source order)
+   — switching colour or layout should read as
+   a cross-fade, not a snap.
+========================================= */
+
+body { transition:background .4s ease, color .4s ease; }
+
+.card, .debt-card, .plan-card, .plan-row-compact, .payment-row,
+.history-entry, .plan-stat, .summary-item, .modal, .modal-overlay,
+.tab-btn, .tabs-indicator, .promo-banner, .reverse-planner,
+.add-debt input, .planner input, .planner select, .payment-input,
+#addDebtButton, #cancelEditButton, .planner-button, .log-payment-btn,
+.log-charge-btn, .settings-btn, .priority-badge, .layout-option,
+.theme-swatch, #themeColorPicker, .theme-hex-input {
+    transition-property:background, background-color, border-color, border-radius, box-shadow, color;
+    transition-duration:.4s;
+    transition-timing-function:ease;
 }
