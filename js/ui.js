@@ -92,6 +92,8 @@ function renderDebts() {
     });
 
     container.innerHTML = html;
+
+    renderPaymentsTab();
 }
 
 function clearForm() {

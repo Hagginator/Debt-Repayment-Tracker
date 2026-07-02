@@ -10,6 +10,14 @@ let customExtraRaw = {};
 let lastBudget = null;
 let lastStrategy = null;
 
+// The most recently rendered plan, kept around so the popup can be
+// opened/closed without re-running the simulation.
+let lastPlanState = null;
+
+// Which debt's payment popup is currently open (by lender name), or
+// null if the popup is closed.
+let openPlanRowLender = null;
+
 function calculatePlan() {
 
     const budget = Number(document.getElementById("monthlyBudget").value);
@@ -43,8 +51,8 @@ function calculatePlan() {
     runPlan();
 }
 
-// Called on every keystroke in an "Extra" input — recalculates the
-// whole plan live using the user's custom payment amounts.
+// Called on every keystroke in the popup's "Extra" input — recalculates
+// the whole plan live using the user's custom payment amounts.
 function updateCustomExtra(lender, rawValue) {
     customExtraRaw[lender] = rawValue;
     currentCustomExtras[lender] = Math.max(0, Number(rawValue) || 0);
@@ -55,6 +63,16 @@ function resetToStrategyDefault() {
     currentCustomExtras = {};
     customExtraRaw = {};
     runPlan();
+}
+
+function openPlanRow(lender) {
+    openPlanRowLender = lender;
+    renderModal();
+}
+
+function closePlanRowModal() {
+    openPlanRowLender = null;
+    renderModal();
 }
 
 function runPlan() {
@@ -79,12 +97,7 @@ function runPlan() {
 
 function renderPlan(sim, baseline, budget, strategy, brokenMinimums) {
 
-    // Preserve focus + cursor position across the re-render, since
-    // every keystroke in an "Extra" field triggers a full recalculation
-    // and a full innerHTML replace would otherwise steal focus.
-    const active = document.activeElement;
-    const activeId = (active && active.id && active.id.startsWith("extraInput-")) ? active.id : null;
-    const selStart = (active && typeof active.selectionStart === "number") ? active.selectionStart : null;
+    lastPlanState = { sim, baseline, budget, strategy, brokenMinimums };
 
     const months = sim.months;
     const years = (months / 12).toFixed(1);
@@ -115,45 +128,23 @@ function renderPlan(sim, baseline, budget, strategy, brokenMinimums) {
            </p>`
         : "";
 
-    // Stable order (same as the debts array) so rows don't jump around
-    // while you're typing into one of them.
-    const paymentRows = sim.breakdown.map((p, i) => {
-        const inputId = `extraInput-${i}`;
-        const displayValue = (activeId === inputId && customExtraRaw[p.lender] !== undefined)
-            ? customExtraRaw[p.lender]
-            : p.extra.toFixed(2);
+    // Stable order (same as the debts array) so rows don't jump around.
+    const paymentRows = sim.breakdown.map(p => {
 
         const originalDebt = debts.find(d => d.lender === p.lender);
         const hasFixedPayment = originalDebt && originalDebt.fixedPayment;
-        const guaranteedLabel = hasFixedPayment ? "🔒 Fixed Payment" : "Minimum";
+
+        const statusBadge = p.extra > 0
+            ? '<span class="plan-status success">Pay Extra</span>'
+            : `<span class="plan-status pending">${hasFixedPayment ? "Fixed Only" : "Minimum Only"}</span>`;
 
         return `
-<div class="plan-row">
-    <div class="plan-lender">
-        <h4>💳 ${p.lender}</h4>
-        ${p.extra > 0 ? '<span class="plan-status success">Pay Extra</span>' : `<span class="plan-status pending">${hasFixedPayment ? "Fixed Only" : "Minimum Only"}</span>`}
+<div class="plan-row-compact" onclick="openPlanRow('${p.lender.replace(/'/g, "\\'")}')">
+    <div class="plan-row-main">
+        <span class="plan-row-name">💳 ${p.lender}</span>
+        ${statusBadge}
     </div>
-    <div class="plan-grid">
-        <div class="plan-stat">
-            <span>${guaranteedLabel}</span>
-            <strong>£${p.minimum.toFixed(2)}</strong>
-        </div>
-        <div class="plan-stat">
-            <span>Extra (edit me)</span>
-            <input
-                type="number"
-                min="0"
-                step="1"
-                class="extra-input"
-                id="${inputId}"
-                value="${displayValue}"
-                oninput="updateCustomExtra('${p.lender.replace(/'/g, "\\'")}', this.value)">
-        </div>
-        <div class="plan-stat" style="grid-column:1 / -1;">
-            <span>Pay This Month</span>
-            <strong>£${p.total.toFixed(2)}</strong>
-        </div>
-    </div>
+    <span class="plan-row-amount">£${p.total.toFixed(2)}</span>
 </div>`;
     }).join("");
 
@@ -193,7 +184,7 @@ function renderPlan(sim, baseline, budget, strategy, brokenMinimums) {
         </button>
     </div>
     <p style="color:var(--muted);font-size:.85rem;margin-top:10px;">
-        Edit "Extra" on any card to set your own payment — the rest of your budget still follows your chosen strategy.
+        Tap a card to fine-tune its payment — the rest of your budget still follows your chosen strategy.
     </p>
     ${paymentRows}
     ${allocationNote}
@@ -202,8 +193,75 @@ function renderPlan(sim, baseline, budget, strategy, brokenMinimums) {
     document.getElementById("repaymentPlan").innerHTML = html;
     document.getElementById("debtFree").textContent = debtFreeDate;
 
-    if (activeId) {
-        const el = document.getElementById(activeId);
+    renderModal();
+}
+
+// Renders (or hides) the "fine-tune this card's payment" popup, based
+// on lastPlanState + openPlanRowLender. Also handles the same
+// focus/cursor preservation the old inline inputs needed, since typing
+// in the popup's Extra field triggers a full recalculation.
+function renderModal() {
+
+    const overlay = document.getElementById("planRowModal");
+    const content = document.getElementById("planRowModalContent");
+
+    if (!lastPlanState || openPlanRowLender === null) {
+        overlay.classList.add("hidden");
+        content.innerHTML = "";
+        return;
+    }
+
+    const { sim } = lastPlanState;
+    const p = sim.breakdown.find(row => row.lender === openPlanRowLender);
+
+    // The debt behind this row may have been deleted since the popup opened.
+    if (!p) {
+        openPlanRowLender = null;
+        overlay.classList.add("hidden");
+        return;
+    }
+
+    const inputId = "extraInput-modal";
+    const active = document.activeElement;
+    const wasExtraInputFocused = active && active.id === inputId;
+    const selStart = wasExtraInputFocused && typeof active.selectionStart === "number" ? active.selectionStart : null;
+
+    const displayValue = (wasExtraInputFocused && customExtraRaw[p.lender] !== undefined)
+        ? customExtraRaw[p.lender]
+        : p.extra.toFixed(2);
+
+    const originalDebt = debts.find(d => d.lender === p.lender);
+    const hasFixedPayment = originalDebt && originalDebt.fixedPayment;
+    const guaranteedLabel = hasFixedPayment ? "🔒 Fixed Payment" : "Minimum";
+
+    content.innerHTML = `
+<h3 style="margin-bottom:20px;">💳 ${p.lender}</h3>
+<div class="plan-grid">
+    <div class="plan-stat">
+        <span>${guaranteedLabel}</span>
+        <strong>£${p.minimum.toFixed(2)}</strong>
+    </div>
+    <div class="plan-stat">
+        <span>Extra (edit me)</span>
+        <input
+            type="number"
+            min="0"
+            step="1"
+            class="extra-input"
+            id="${inputId}"
+            value="${displayValue}"
+            oninput="updateCustomExtra('${p.lender.replace(/'/g, "\\'")}', this.value)">
+    </div>
+    <div class="plan-stat" style="grid-column:1 / -1;">
+        <span>Pay This Month</span>
+        <strong>£${p.total.toFixed(2)}</strong>
+    </div>
+</div>`;
+
+    overlay.classList.remove("hidden");
+
+    if (wasExtraInputFocused) {
+        const el = document.getElementById(inputId);
         if (el) {
             el.focus();
             if (selStart !== null && el.setSelectionRange) {

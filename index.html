@@ -17,7 +17,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Debt Manager">
 
-    <link rel="stylesheet" href="css/style.css?v=22">
+    <link rel="stylesheet" href="css/style.css?v=23">
 
 </head>
 
@@ -56,172 +56,210 @@
         </header>
 
         <!-- ==========================
-             SUMMARY
+             TABS
         =========================== -->
 
-        <div class="summary">
-
-            <div class="card">
-                <h2>Total Debt</h2>
-                <p id="totalDebt">£0.00</p>
-            </div>
-
-            <div class="card">
-                <h2>Monthly Interest</h2>
-                <p id="monthlyInterest">£0.00</p>
-            </div>
-
-            <div class="card">
-                <h2>Total Credit Limit</h2>
-                <p id="creditLimit">£0.00</p>
-            </div>
-
-            <div class="card">
-                <h2>Overall Utilisation</h2>
-                <p id="utilisation">0%</p>
-            </div>
-
-            <div class="card">
-                <h2>Total Minimum Payments</h2>
-                <p id="minimumPayments">£0.00</p>
-            </div>
-
-            <div class="card">
-                <h2>Debt Free</h2>
-                <p id="debtFree">--</p>
-            </div>
-
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="dashboard" onclick="switchTab('dashboard')">📊 Dashboard</button>
+            <button class="tab-btn" data-tab="payments" onclick="switchTab('payments')">💷 Log Payment</button>
+            <button class="tab-btn" data-tab="planner" onclick="switchTab('planner')">🗺️ Planner</button>
         </div>
 
         <!-- ==========================
-             ADD DEBT
+             DASHBOARD TAB
         =========================== -->
 
-        <h2>Your Debts</h2>
+        <div id="tab-dashboard" class="tab-content active">
 
-        <div class="add-debt">
+            <div class="summary">
 
-            <input
-                type="text"
-                id="lender"
-                placeholder="Lender">
+                <div class="card">
+                    <h2>Total Debt</h2>
+                    <p id="totalDebt">£0.00</p>
+                </div>
 
-            <input
-                type="number"
-                id="balance"
-                placeholder="Balance">
+                <div class="card">
+                    <h2>Monthly Interest</h2>
+                    <p id="monthlyInterest">£0.00</p>
+                </div>
 
-            <input
-                type="number"
-                id="apr"
-                placeholder="APR">
+                <div class="card">
+                    <h2>Total Credit Limit</h2>
+                    <p id="creditLimit">£0.00</p>
+                </div>
 
-            <input
-                type="number"
-                id="limit"
-                placeholder="Credit Limit">
+                <div class="card">
+                    <h2>Overall Utilisation</h2>
+                    <p id="utilisation">0%</p>
+                </div>
 
-            <input
-                type="number"
-                id="minimum"
-                placeholder="Min Payment">
+                <div class="card">
+                    <h2>Total Minimum Payments</h2>
+                    <p id="minimumPayments">£0.00</p>
+                </div>
 
-            <input
-                type="number"
-                id="promoApr"
-                title="Optional — leave blank if this card has no 0% promo"
-                placeholder="Promo APR %">
+                <div class="card">
+                    <h2>Debt Free</h2>
+                    <p id="debtFree">--</p>
+                </div>
 
-            <input
-                type="date"
-                id="promoEndDate"
-                placeholder="Promo Ends (optional)">
+            </div>
 
-            <input
-                type="number"
-                id="fixedPayment"
-                title="Optional — the amount you actually pay each month, if more than the minimum"
-                placeholder="Fixed Payment">
+            <h2>Your Debts</h2>
 
-            <button
-                id="addDebtButton"
-                onclick="addDebt()">
+            <div class="add-debt">
 
-                Add Debt
-
-            </button>
-
-        </div>
-
-        <!-- ==========================
-             REPAYMENT PLANNER
-        =========================== -->
-
-        <h2>Repayment Planner</h2>
-
-        <div class="planner">
-
-            <div class="planner-budget">
-
-                <label for="monthlyBudget">
-                    Monthly Budget
-                </label>
+                <input
+                    type="text"
+                    id="lender"
+                    placeholder="Lender">
 
                 <input
                     type="number"
-                    id="monthlyBudget"
-                    placeholder="£350">
+                    id="balance"
+                    placeholder="Balance">
+
+                <input
+                    type="number"
+                    id="apr"
+                    placeholder="APR">
+
+                <input
+                    type="number"
+                    id="limit"
+                    placeholder="Credit Limit">
+
+                <input
+                    type="number"
+                    id="minimum"
+                    placeholder="Min Payment">
+
+                <input
+                    type="number"
+                    id="promoApr"
+                    title="Optional — leave blank if this card has no 0% promo"
+                    placeholder="Promo APR %">
+
+                <input
+                    type="date"
+                    id="promoEndDate"
+                    placeholder="Promo Ends (optional)">
+
+                <input
+                    type="number"
+                    id="fixedPayment"
+                    title="Optional — the amount you actually pay each month, if more than the minimum"
+                    placeholder="Fixed Payment">
+
+                <button
+                    id="addDebtButton"
+                    onclick="addDebt()">
+
+                    Add Debt
+
+                </button>
 
             </div>
 
-            <div class="planner-strategy">
-
-                <label for="strategy">
-                    Repayment Strategy
-                </label>
-
-                <select id="strategy">
-
-                    <option value="avalanche">
-                        🔥 Avalanche (Highest APR)
-                    </option>
-
-                    <option value="snowball">
-                        ❄️ Snowball (Smallest Balance)
-                    </option>
-
-                </select>
-
-            </div>
-
-            <button
-                class="planner-button"
-                onclick="calculatePlan()">
-
-                Calculate Plan
-
-            </button>
+            <div id="debts"></div>
 
         </div>
 
-        <div id="repaymentPlan"></div>
-
         <!-- ==========================
-             DEBTS
+             PAYMENTS TAB
         =========================== -->
 
-        <div id="debts"></div>
+        <div id="tab-payments" class="tab-content">
+
+            <h2>Log a Payment</h2>
+            <p style="color:var(--muted);font-size:.9rem;margin-bottom:24px;">
+                Made a payment this month? Log it here and your balances update straight away.
+            </p>
+
+            <div id="paymentsList"></div>
+
+        </div>
+
+        <!-- ==========================
+             PLANNER TAB
+        =========================== -->
+
+        <div id="tab-planner" class="tab-content">
+
+            <h2>Repayment Planner</h2>
+
+            <div class="planner">
+
+                <div class="planner-budget">
+
+                    <label for="monthlyBudget">
+                        Monthly Budget
+                    </label>
+
+                    <input
+                        type="number"
+                        id="monthlyBudget"
+                        placeholder="£350">
+
+                </div>
+
+                <div class="planner-strategy">
+
+                    <label for="strategy">
+                        Repayment Strategy
+                    </label>
+
+                    <select id="strategy">
+
+                        <option value="avalanche">
+                            🔥 Avalanche (Highest APR)
+                        </option>
+
+                        <option value="snowball">
+                            ❄️ Snowball (Smallest Balance)
+                        </option>
+
+                    </select>
+
+                </div>
+
+                <button
+                    class="planner-button"
+                    onclick="calculatePlan()">
+
+                    Calculate Plan
+
+                </button>
+
+            </div>
+
+            <div id="repaymentPlan"></div>
+
+        </div>
 
     </div>
 
-    <script src="js/debts.js?v=22"></script>
-    <script src="js/ui.js?v=22"></script>
-    <script src="js/storage.js?v=22"></script>
-    <script src="js/calculations.js?v=22"></script>
-    
-    <script src="js/repaymentEngine.js?v=22"></script>
-    <script src="js/planner.js?v=22"></script>
-    <script src="js/app.js?v=22"></script>
+    <!-- ==========================
+         PLAN ROW MODAL
+    =========================== -->
+
+    <div id="planRowModal" class="modal-overlay hidden" onclick="if (event.target === this) closePlanRowModal()">
+        <div class="modal">
+            <button class="modal-close" onclick="closePlanRowModal()">✕</button>
+            <div id="planRowModalContent"></div>
+        </div>
+    </div>
+
+    <script src="js/debts.js?v=23"></script>
+    <script src="js/ui.js?v=23"></script>
+    <script src="js/storage.js?v=23"></script>
+    <script src="js/calculations.js?v=23"></script>
+    <script src="js/payments.js?v=23"></script>
+    <script src="js/tabs.js?v=23"></script>
+
+    <script src="js/repaymentEngine.js?v=23"></script>
+    <script src="js/planner.js?v=23"></script>
+    <script src="js/app.js?v=23"></script>
 
     <script>
         if ("serviceWorker" in navigator) {
