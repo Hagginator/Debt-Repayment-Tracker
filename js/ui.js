@@ -73,26 +73,12 @@ function renderDebts() {
 
     debts.forEach((debt, index) => {
 
+        const isLoan = debt.type === "loan";
         const effectiveApr = getEffectiveApr(debt, 0);
         const isPromoActive = isPromoCurrentlyActive(debt, 0);
         const isPriority = debt.lender === priorityLender;
-
-        const utilisation = debt.limit > 0 ? (debt.balance / debt.limit) * 100 : 0;
-        const availableCredit = Math.max(0, debt.limit - debt.balance);
         const monthlyInterest = (debt.balance * (effectiveApr / 100)) / 12;
-        const progressWidth = Math.min(utilisation, 100);
         const effectiveMinimum = getEffectiveMinimum(debt);
-        const isPercentMinimum = debt.minPercent !== null && debt.minPercent !== undefined && debt.minPercent !== "";
-
-        let progressColour, healthText, healthIcon;
-
-        if (utilisation < 30) {
-            progressColour = "#00A650"; healthText = "Healthy"; healthIcon = "🟢";
-        } else if (utilisation < 50) {
-            progressColour = "#FFB800"; healthText = "Moderate"; healthIcon = "🟡";
-        } else {
-            progressColour = "#E10600"; healthText = "High Utilisation"; healthIcon = "🔴";
-        }
 
         const promoEndLabel = isPromoActive
             ? new Date(debt.promoEndDate).toLocaleDateString("en-GB", { month: "short", year: "numeric" })
@@ -102,34 +88,51 @@ function renderDebts() {
             ? `${effectiveApr}% APR <span style="color:var(--accent);">· 0% promo till ${promoEndLabel}</span>`
             : `${debt.apr}% APR`;
 
-        html += `
-<div class="debt-card${isPriority ? " priority-debt" : ""}" style="animation-delay:${Math.min(index, 6) * 60}ms;">
+        let progressWidth, progressColour, statusText, statusIcon, statsBlock;
 
-    <div class="debt-top">
-        <div>
-            <h3>💳 ${debt.lender} ${isPriority ? '<span class="priority-badge">🎯 Pay First</span>' : ""}</h3>
-            <p style="margin-top:6px;color:var(--muted);font-family:var(--font-mono);">${aprLine}</p>
+        if (isLoan) {
+            const original = Number(debt.originalPrincipal) || debt.balance;
+            const paidOffPct = original > 0 ? ((original - debt.balance) / original) * 100 : 0;
+            progressWidth = Math.min(Math.max(paidOffPct, 0), 100);
+            progressColour = "#00A650";
+            statusText = progressWidth >= 99.99 ? "Paid Off" : "On Track";
+            statusIcon = progressWidth >= 99.99 ? "🎉" : "📈";
+
+            statsBlock = `
+    <div class="plan-grid">
+        <div class="plan-stat">
+            <span>Original Loan Amount</span>
+            <strong>£${original.toFixed(2)}</strong>
         </div>
-        <div class="debt-actions">
-            <button class="edit-btn" onclick="editDebt(${index})">✏️</button>
-            <button class="delete-btn" onclick="deleteDebt(${index})">🗑️</button>
+        <div class="plan-stat">
+            <span>Term</span>
+            <strong>${debt.termMonths} months</strong>
         </div>
-    </div>
+        <div class="plan-stat">
+            <span>Monthly Interest</span>
+            <strong>£${monthlyInterest.toFixed(2)}</strong>
+        </div>
+        <div class="plan-stat">
+            <span>Monthly Payment</span>
+            <strong>£${effectiveMinimum.toFixed(2)}</strong>
+        </div>
+    </div>`;
+        } else {
+            const utilisation = debt.limit > 0 ? (debt.balance / debt.limit) * 100 : 0;
+            const availableCredit = Math.max(0, debt.limit - debt.balance);
+            const isPercentMinimum = debt.minPercent !== null && debt.minPercent !== undefined && debt.minPercent !== "";
 
-    <div style="margin:28px 0;">
-        <div style="color:var(--muted);margin-bottom:8px;font-family:var(--font-display);text-transform:uppercase;letter-spacing:.5px;font-size:.85rem;">Current Balance</div>
-        <div style="font-size:2rem;font-weight:700;font-family:var(--font-mono);">£${debt.balance.toFixed(2)}</div>
-    </div>
+            progressWidth = Math.min(utilisation, 100);
 
-    <div class="progress">
-        <div class="progress-fill" style="width:${progressWidth}%;background:${progressColour};"></div>
-    </div>
+            if (utilisation < 30) {
+                progressColour = "#00A650"; statusText = "Healthy"; statusIcon = "🟢";
+            } else if (utilisation < 50) {
+                progressColour = "#FFB800"; statusText = "Moderate"; statusIcon = "🟡";
+            } else {
+                progressColour = "#E10600"; statusText = "High Utilisation"; statusIcon = "🔴";
+            }
 
-    <div style="display:flex;justify-content:space-between;margin-top:10px;margin-bottom:24px;font-family:var(--font-display);">
-        <span>${utilisation.toFixed(1)}% Utilised</span>
-        <strong>${healthIcon} ${healthText}</strong>
-    </div>
-
+            statsBlock = `
     <div class="plan-grid">
         <div class="plan-stat">
             <span>Credit Limit</span>
@@ -152,7 +155,38 @@ function renderDebts() {
             <span>🔒 Fixed Payment</span>
             <strong>£${Number(debt.fixedPayment).toFixed(2)}/mo</strong>
         </div>` : ""}
+    </div>`;
+        }
+
+        html += `
+<div class="debt-card${isPriority ? " priority-debt" : ""}" style="animation-delay:${Math.min(index, 6) * 60}ms;">
+
+    <div class="debt-top">
+        <div>
+            <h3>${isLoan ? "🏦" : "💳"} ${debt.lender} ${isPriority ? '<span class="priority-badge">🎯 Pay First</span>' : ""}</h3>
+            <p style="margin-top:6px;color:var(--muted);font-family:var(--font-mono);">${aprLine}</p>
+        </div>
+        <div class="debt-actions">
+            <button class="edit-btn" onclick="editDebt(${index})">✏️</button>
+            <button class="delete-btn" onclick="deleteDebt(${index})">🗑️</button>
+        </div>
     </div>
+
+    <div style="margin:28px 0;">
+        <div style="color:var(--muted);margin-bottom:8px;font-family:var(--font-display);text-transform:uppercase;letter-spacing:.5px;font-size:.85rem;">${isLoan ? "Remaining Balance" : "Current Balance"}</div>
+        <div style="font-size:2rem;font-weight:700;font-family:var(--font-mono);">£${debt.balance.toFixed(2)}</div>
+    </div>
+
+    <div class="progress">
+        <div class="progress-fill" style="width:${progressWidth}%;background:${progressColour};"></div>
+    </div>
+
+    <div style="display:flex;justify-content:space-between;margin-top:10px;margin-bottom:24px;font-family:var(--font-display);">
+        <span>${progressWidth.toFixed(1)}% ${isLoan ? "Paid Off" : "Utilised"}</span>
+        <strong>${statusIcon} ${statusText}</strong>
+    </div>
+
+    ${statsBlock}
 
 </div>`;
 
@@ -162,6 +196,15 @@ function renderDebts() {
 
     renderPaymentsTab();
     renderPromoBanner();
+}
+
+// Loans and cards need different fields — a loan has a fixed term
+// instead of a credit limit/min-%/promo/fixed-payment, since none of
+// those concepts apply to a fixed-payment loan.
+function toggleDebtTypeFields() {
+    const isLoan = document.getElementById("debtType").value === "loan";
+    document.querySelectorAll(".card-field").forEach(el => el.classList.toggle("hidden", isLoan));
+    document.querySelectorAll(".loan-field").forEach(el => el.classList.toggle("hidden", !isLoan));
 }
 
 // A quick shake to draw the eye to the add-debt form when validation
@@ -184,4 +227,7 @@ function clearForm() {
     document.getElementById("promoApr").value = "";
     document.getElementById("promoEndDate").value = "";
     document.getElementById("fixedPayment").value = "";
+    document.getElementById("termMonths").value = "";
+    document.getElementById("debtType").value = "card";
+    toggleDebtTypeFields();
 }

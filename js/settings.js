@@ -44,21 +44,25 @@ function exportCsv() {
     }
 
     const headers = [
-        "Lender", "Balance", "APR (%)", "Credit Limit", "Minimum Payment",
-        "Minimum %", "Effective Minimum Payment", "Promo APR (%)", "Promo End Date", "Fixed Payment"
+        "Lender", "Type", "Balance", "APR (%)", "Credit Limit", "Minimum Payment",
+        "Minimum %", "Effective Minimum Payment", "Promo APR (%)", "Promo End Date", "Fixed Payment",
+        "Loan Term (months)", "Original Loan Amount"
     ];
 
     const rows = debts.map(d => [
         d.lender,
+        d.type === "loan" ? "Loan" : "Credit Card",
         d.balance.toFixed(2),
         d.apr,
-        d.limit,
+        d.limit ?? "",
         d.minimum.toFixed(2),
         d.minPercent ?? "",
         getEffectiveMinimum(d).toFixed(2),
         d.promoApr ?? "",
         d.promoEndDate ?? "",
-        d.fixedPayment ?? ""
+        d.fixedPayment ?? "",
+        d.termMonths ?? "",
+        d.originalPrincipal ?? ""
     ]);
 
     const escapeCell = (value) => {

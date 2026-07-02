@@ -354,6 +354,42 @@ h3, h4 { font-family:var(--font-display); font-weight:600; letter-spacing:.5px; 
 .planner-button:hover { transform:translateY(-3px); box-shadow:0 15px 35px rgba(var(--accent-rgb),.3); }
 .planner-button:active { transform:translateY(-1px) scale(.97); }
 
+/* ===== PURCHASE ADVISOR ===== */
+
+.advisor-section {
+    background:rgba(255,255,255,.03);
+    border:1px solid var(--border);
+    border-radius:18px;
+    padding:20px 22px;
+    margin-bottom:35px;
+}
+.advisor-section h2 { margin-bottom:6px; }
+
+.advisor-row { display:flex; gap:12px; flex-wrap:wrap; margin-top:14px; }
+.advisor-row input {
+    flex:1;
+    min-width:140px;
+    background:var(--surface);
+    color:var(--text);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:14px;
+    font-size:1rem;
+    font-family:var(--font-mono);
+}
+.advisor-row input:focus { outline:none; border-color:var(--accent); }
+
+.advisor-result {
+    margin-top:16px;
+    padding:16px 18px;
+    background:rgba(255,255,255,.03);
+    border-radius:14px;
+    color:var(--text);
+    font-size:.95rem;
+    line-height:1.6;
+}
+.advisor-result strong { color:var(--accent); }
+
 /* ===== REVERSE PLANNER ===== */
 
 .reverse-planner {
@@ -867,7 +903,7 @@ h3, h4 { font-family:var(--font-display); font-weight:600; letter-spacing:.5px; 
     40%, 60% { transform:translateX(7px); }
 }
 
-.add-debt input {
+.add-debt input, .add-debt select {
     padding:12px 14px;
     border-radius:10px;
     border:1px solid var(--border);
@@ -878,7 +914,7 @@ h3, h4 { font-family:var(--font-display); font-weight:600; letter-spacing:.5px; 
     text-overflow:ellipsis;
     outline:none;
 }
-.add-debt input:focus { border-color:var(--accent); }
+.add-debt input:focus, .add-debt select:focus { border-color:var(--accent); }
 .add-debt input[type="date"]::-webkit-calendar-picker-indicator { filter:invert(1); cursor:pointer; }
 
 #addDebtButton {

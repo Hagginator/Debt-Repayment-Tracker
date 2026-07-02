@@ -1,46 +1,111 @@
 let debts = [];
 let editingIndex = null;
 
+// A loan's payment isn't chosen — it's the fixed amount that exactly
+// clears the principal over the given term at the given rate. Falls
+// back to a plain equal split for a 0% loan, since the standard
+// formula divides by zero at monthlyRate === 0.
+function calculateLoanPayment(principal, apr, termMonths) {
+    const monthlyRate = (apr / 100) / 12;
+    if (monthlyRate === 0) return principal / termMonths;
+    return principal * monthlyRate * Math.pow(1 + monthlyRate, termMonths)
+        / (Math.pow(1 + monthlyRate, termMonths) - 1);
+}
+
 function addDebt() {
+
+    const debtType = document.getElementById("debtType").value;
+    const isLoan = debtType === "loan";
 
     const lender = document.getElementById("lender").value;
     const balance = Number(document.getElementById("balance").value);
     const apr = Number(document.getElementById("apr").value);
+    const termMonths = Number(document.getElementById("termMonths").value);
+
     const limit = Number(document.getElementById("limit").value);
-    const minimum = Number(document.getElementById("minimum").value);
+    const minimumRaw = document.getElementById("minimum").value;
 
     const minPercentRaw = document.getElementById("minPercent").value;
     const promoAprRaw = document.getElementById("promoApr").value;
     const promoEndDateRaw = document.getElementById("promoEndDate").value;
     const fixedPaymentRaw = document.getElementById("fixedPayment").value;
 
-    if (!lender || balance <= 0 || apr < 0 || limit <= 0 || minimum <= 0) {
+    if (!lender || balance <= 0 || apr < 0) {
         shakeForm();
         alert("Please complete every field.");
         return;
     }
 
-    if (fixedPaymentRaw !== "" && Number(fixedPaymentRaw) < minimum) {
-        shakeForm();
-        alert("Fixed payment can't be less than the minimum payment.");
-        return;
+    if (isLoan) {
+        if (termMonths <= 0) {
+            shakeForm();
+            alert("Enter a loan term in months.");
+            return;
+        }
+    } else {
+        if (limit <= 0 || Number(minimumRaw) <= 0) {
+            shakeForm();
+            alert("Please complete every field.");
+            return;
+        }
+        if (fixedPaymentRaw !== "" && Number(fixedPaymentRaw) < Number(minimumRaw)) {
+            shakeForm();
+            alert("Fixed payment can't be less than the minimum payment.");
+            return;
+        }
     }
 
-    // Promo fields are optional — both must be filled in for a promo
-    // to apply, otherwise the card just uses its normal APR.
-    const promoApr = (promoAprRaw !== "" && promoEndDateRaw !== "") ? Number(promoAprRaw) : null;
-    const promoEndDate = (promoAprRaw !== "" && promoEndDateRaw !== "") ? promoEndDateRaw : null;
-    const fixedPayment = fixedPaymentRaw !== "" ? Number(fixedPaymentRaw) : null;
-    const minPercent = minPercentRaw !== "" ? Number(minPercentRaw) : null;
+    // A real loan's payment is fixed at origination — correcting the
+    // balance later (or just re-saving) shouldn't quietly re-amortize
+    // it lower. Only recalculate when the loan is brand new, converting
+    // from a card, or the APR/term itself changed (i.e. an actual
+    // refinance), otherwise keep whatever payment was already set.
+    let loanMinimum;
+    if (isLoan) {
+        const existing = editingIndex !== null ? debts[editingIndex] : null;
+        const isRefinance = !existing || existing.type !== "loan"
+            || Number(existing.apr) !== apr || Number(existing.termMonths) !== termMonths;
+        loanMinimum = isRefinance ? calculateLoanPayment(balance, apr, termMonths) : existing.minimum;
+    }
 
-    const debt = { lender, balance, apr, limit, minimum, minPercent, promoApr, promoEndDate, fixedPayment };
+    const debt = isLoan
+        ? {
+            lender, balance, apr,
+            type: "loan",
+            termMonths,
+            minimum: loanMinimum,
+            limit: null, minPercent: null, promoApr: null, promoEndDate: null, fixedPayment: null
+        }
+        : {
+            lender, balance, apr,
+            type: "card",
+            termMonths: null,
+            limit,
+            minimum: Number(minimumRaw),
+            minPercent: minPercentRaw !== "" ? Number(minPercentRaw) : null,
+            // Promo fields are optional — both must be filled in for a
+            // promo to apply, otherwise the card just uses its normal APR.
+            promoApr: (promoAprRaw !== "" && promoEndDateRaw !== "") ? Number(promoAprRaw) : null,
+            promoEndDate: (promoAprRaw !== "" && promoEndDateRaw !== "") ? promoEndDateRaw : null,
+            fixedPayment: fixedPaymentRaw !== "" ? Number(fixedPaymentRaw) : null
+        };
 
     if (editingIndex === null) {
         debt.history = [];
+        if (isLoan) debt.originalPrincipal = balance;
         debts.push(debt);
     } else {
         const existing = debts[editingIndex];
         debt.history = existing.history || [];
+
+        // The original loan amount is a fixed reference point for the
+        // "paid off so far" progress bar — keep it from before rather
+        // than resetting it every time the loan is edited.
+        if (isLoan) {
+            debt.originalPrincipal = (existing.type === "loan" && existing.originalPrincipal)
+                ? existing.originalPrincipal
+                : balance;
+        }
 
         // If the balance was changed by hand (rather than via Log
         // Payment/Charge), record it too — otherwise the history trail
@@ -85,16 +150,20 @@ function deleteDebt(index) {
 function editDebt(index) {
 
     const debt = debts[index];
+    const isLoan = debt.type === "loan";
 
+    document.getElementById("debtType").value = isLoan ? "loan" : "card";
     document.getElementById("lender").value = debt.lender;
     document.getElementById("balance").value = debt.balance;
     document.getElementById("apr").value = debt.apr;
-    document.getElementById("limit").value = debt.limit;
-    document.getElementById("minimum").value = debt.minimum;
+    document.getElementById("termMonths").value = debt.termMonths || "";
+    document.getElementById("limit").value = debt.limit || "";
+    document.getElementById("minimum").value = isLoan ? "" : debt.minimum;
     document.getElementById("minPercent").value = (debt.minPercent !== null && debt.minPercent !== undefined) ? debt.minPercent : "";
     document.getElementById("promoApr").value = (debt.promoApr !== null && debt.promoApr !== undefined) ? debt.promoApr : "";
     document.getElementById("promoEndDate").value = debt.promoEndDate || "";
     document.getElementById("fixedPayment").value = (debt.fixedPayment !== null && debt.fixedPayment !== undefined) ? debt.fixedPayment : "";
+    toggleDebtTypeFields();
 
     editingIndex = index;
     document.getElementById("addDebtButton").textContent = "Save Changes";

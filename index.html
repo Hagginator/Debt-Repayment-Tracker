@@ -17,7 +17,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Debt Manager">
 
-    <link rel="stylesheet" href="css/style.css?v=43">
+    <link rel="stylesheet" href="css/style.css?v=47">
 
 </head>
 
@@ -109,9 +109,24 @@
 
             </div>
 
+            <div class="advisor-section">
+                <h2>Thinking About a Purchase?</h2>
+                <p class="settings-hint">Tell me how much and I'll tell you which card does the least damage.</p>
+                <div class="advisor-row">
+                    <input type="number" id="purchaseAmount" min="0" step="1" placeholder="e.g. 500">
+                    <button class="planner-button" onclick="renderPurchaseAdvice()">Ask</button>
+                </div>
+                <div id="purchaseAdviceResult"></div>
+            </div>
+
             <h2>Your Debts</h2>
 
             <div class="add-debt">
+
+                <select id="debtType" onchange="toggleDebtTypeFields()" title="A card is revolving credit with a flexible balance; a loan has a fixed payment over a fixed term.">
+                    <option value="card">💳 Credit Card</option>
+                    <option value="loan">🏦 Loan</option>
+                </select>
 
                 <input
                     type="text"
@@ -130,17 +145,29 @@
 
                 <input
                     type="number"
+                    id="termMonths"
+                    class="loan-field hidden"
+                    min="1"
+                    step="1"
+                    title="How many months the loan runs for — the fixed monthly payment is calculated from this."
+                    placeholder="Term (months)">
+
+                <input
+                    type="number"
                     id="limit"
+                    class="card-field"
                     placeholder="Credit Limit">
 
                 <input
                     type="number"
                     id="minimum"
+                    class="card-field"
                     placeholder="Min Payment">
 
                 <input
                     type="number"
                     id="minPercent"
+                    class="card-field"
                     step="0.1"
                     title="Optional — most cards require the greater of this % of your balance or the flat Min Payment above. Leave blank to always use the flat amount."
                     placeholder="Min % (optional)">
@@ -148,17 +175,20 @@
                 <input
                     type="number"
                     id="promoApr"
+                    class="card-field"
                     title="Optional — leave blank if this card has no 0% promo"
                     placeholder="Promo APR %">
 
                 <input
                     type="date"
                     id="promoEndDate"
+                    class="card-field"
                     placeholder="Promo Ends (optional)">
 
                 <input
                     type="number"
                     id="fixedPayment"
+                    class="card-field"
                     title="Optional — the amount you actually pay each month, if more than the minimum"
                     placeholder="Fixed Payment">
 
@@ -396,20 +426,21 @@
     <!-- Full-screen confetti burst, drawn when a debt is fully paid off -->
     <canvas id="confettiCanvas" class="hidden"></canvas>
 
-    <script src="js/debts.js?v=43"></script>
-    <script src="js/ui.js?v=43"></script>
-    <script src="js/storage.js?v=43"></script>
-    <script src="js/calculations.js?v=43"></script>
-    <script src="js/payments.js?v=43"></script>
-    <script src="js/tabs.js?v=43"></script>
-    <script src="js/settings.js?v=43"></script>
-    <script src="js/theme.js?v=43"></script>
-    <script src="js/layout.js?v=43"></script>
-    <script src="js/confetti.js?v=43"></script>
+    <script src="js/debts.js?v=47"></script>
+    <script src="js/ui.js?v=47"></script>
+    <script src="js/storage.js?v=47"></script>
+    <script src="js/calculations.js?v=47"></script>
+    <script src="js/payments.js?v=47"></script>
+    <script src="js/tabs.js?v=47"></script>
+    <script src="js/settings.js?v=47"></script>
+    <script src="js/theme.js?v=47"></script>
+    <script src="js/layout.js?v=47"></script>
+    <script src="js/advisor.js?v=47"></script>
+    <script src="js/confetti.js?v=47"></script>
 
-    <script src="js/repaymentEngine.js?v=43"></script>
-    <script src="js/planner.js?v=43"></script>
-    <script src="js/app.js?v=43"></script>
+    <script src="js/repaymentEngine.js?v=47"></script>
+    <script src="js/planner.js?v=47"></script>
+    <script src="js/app.js?v=47"></script>
 
     <script>
         if ("serviceWorker" in navigator) {

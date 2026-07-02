@@ -79,14 +79,13 @@ function renderPaymentsTab() {
     container.innerHTML = debts.map((debt, index) => {
 
         const historySection = buildHistorySectionHtml(debt);
+        const isLoan = debt.type === "loan";
+        const icon = isLoan ? "🏦" : "💳";
 
         if (debt.balance <= 0.01) {
-            return `
-<div class="payment-row">
-    <div class="payment-row-info">
-        <h4>💳 ${debt.lender}</h4>
-        <span class="payment-row-balance">🎉 Paid off</span>
-    </div>
+            // A loan simply ends once it's paid off — unlike a card,
+            // there's no "log a charge" to bring it back to life.
+            const chargeAction = isLoan ? "" : `
     <div class="payment-row-action">
         <input
             type="number"
@@ -96,15 +95,23 @@ function renderPaymentsTab() {
             id="paymentInput-${index}"
             placeholder="Amount">
         <button class="log-charge-btn" onclick="logCharge(${index})">➕ Log Charge</button>
-    </div>
+    </div>`;
+            return `
+<div class="payment-row">
+    <div class="payment-row-info">
+        <h4>${icon} ${debt.lender}</h4>
+        <span class="payment-row-balance">🎉 Paid off</span>
+    </div>${chargeAction}
     ${historySection}
 </div>`;
         }
 
+        const chargeButton = isLoan ? "" : `<button class="log-charge-btn" onclick="logCharge(${index})">➕ Charge</button>`;
+
         return `
 <div class="payment-row">
     <div class="payment-row-info">
-        <h4>💳 ${debt.lender}</h4>
+        <h4>${icon} ${debt.lender}</h4>
         <span class="payment-row-balance">Balance: £${debt.balance.toFixed(2)}</span>
     </div>
     <div class="payment-row-action">
@@ -116,7 +123,7 @@ function renderPaymentsTab() {
             id="paymentInput-${index}"
             placeholder="£${getGuaranteedPayment(debt).toFixed(2)}">
         <button class="log-payment-btn" onclick="logPayment(${index})">➖ Payment</button>
-        <button class="log-charge-btn" onclick="logCharge(${index})">➕ Charge</button>
+        ${chargeButton}
     </div>
     ${historySection}
 </div>`;
@@ -165,6 +172,9 @@ function logPayment(index) {
 // payment's fee, whatever added to the balance instead of reducing it.
 function logCharge(index) {
 
+    const debt = debts[index];
+    if (debt.type === "loan") return; // loans don't take new charges
+
     const input = document.getElementById(`paymentInput-${index}`);
     const amount = Number(input.value);
 
@@ -173,7 +183,6 @@ function logCharge(index) {
         return;
     }
 
-    const debt = debts[index];
     debt.balance += amount;
 
     recordHistory(debt, "charge", "up", amount);
