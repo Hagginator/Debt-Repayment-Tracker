@@ -1889,3 +1889,85 @@ html[data-layout="glass"] .settings-hint { color:#C2CEE2; }
     .nav-indicator { transition:none !important; }
     .summary .card:first-child::after { animation:none !important; }
 }
+
+/* =========================================================================
+   CHART TOOLTIP — what changed at each point on the progress line
+========================================================================= */
+
+/* The tooltip is positioned against this box. */
+.progress-section { position:relative; }
+
+.pg-hit { fill:transparent; stroke:none; cursor:pointer; }
+
+.pg-dot { transition:r .18s var(--ease-out), fill .18s var(--ease-out); }
+.pg-dot.has-event { fill:var(--accent); }
+.pg-dot.active { r:7; }
+
+/* Vertical guide dropped from the hovered point — ties the tooltip to the
+   place on the line it's describing. */
+.pg-guide {
+    stroke:var(--accent);
+    stroke-width:1;
+    stroke-dasharray:3 4;
+    opacity:0;
+    pointer-events:none;
+    vector-effect:non-scaling-stroke;
+    transition:opacity .18s var(--ease-out);
+}
+.pg-guide.show { opacity:.45; }
+
+.pg-tip {
+    position:absolute;
+    left:0; top:0;
+    transform:translate(-50%, -100%) translateY(-6px);
+    min-width:190px;
+    max-width:270px;
+    padding:11px 13px;
+    border-radius:12px;
+    background:color-mix(in srgb, var(--surface-light) 92%, transparent);
+    border:1px solid var(--border);
+    box-shadow:var(--edge), var(--shadow-lg);
+    backdrop-filter:blur(14px);
+    -webkit-backdrop-filter:blur(14px);
+    color:var(--text);
+    font-size:.84rem;
+    line-height:1.45;
+    pointer-events:none;
+    opacity:0;
+    z-index:5;
+    transition:opacity .16s var(--ease-out), transform .16s var(--ease-out);
+}
+.pg-tip.show { opacity:1; transform:translate(-50%, -100%) translateY(-12px); }
+
+.pg-tip-date {
+    display:block;
+    font-family:var(--font-display);
+    font-size:.72rem;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    color:var(--muted);
+    margin-bottom:7px;
+}
+
+.pg-tip-row { display:flex; align-items:center; gap:8px; margin:4px 0; }
+.pg-tip-dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+.pg-tip-dot.down { background:var(--success); }
+.pg-tip-dot.up   { background:var(--danger); }
+.pg-tip-what { flex:1; min-width:0; }
+.pg-tip-row b { font-family:var(--font-mono); font-size:.82rem; white-space:nowrap; }
+.pg-tip-row b.down { color:var(--success); }
+.pg-tip-row b.up   { color:var(--danger); }
+
+.pg-tip-note { color:var(--muted); font-size:.8rem; margin:2px 0 4px; }
+
+.pg-tip-total {
+    margin-top:8px;
+    padding-top:7px;
+    border-top:1px solid var(--border);
+    color:var(--muted);
+    font-size:.78rem;
+    display:flex;
+    justify-content:space-between;
+    gap:10px;
+}
+.pg-tip-total b { color:var(--text); font-family:var(--font-mono); }
