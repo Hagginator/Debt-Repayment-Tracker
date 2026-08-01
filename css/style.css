@@ -7,7 +7,7 @@
    Theme: Aston Martin Racing Green
 ========================================= */
 
-@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap');
 
 :root {
     --bg:#081512;
@@ -30,10 +30,18 @@
 
     --accent-rgb:196,240,0;
     --border:rgba(var(--accent-rgb),.12);
-    --radius:22px;
-    --shadow:0 15px 40px rgba(0,0,0,.45);
+    --radius:14px;
 
-    --font-display:'Rajdhani', Arial, sans-serif;
+    /* Layered depth — a tight contact shadow plus a soft cast one, and a
+       lit top edge — instead of one flat blur. This is the "not flat" fix. */
+    --shadow:0 1px 2px rgba(0,0,0,.30), 0 12px 28px -10px rgba(0,0,0,.55);
+    --shadow-lg:0 2px 6px rgba(0,0,0,.32), 0 34px 60px -18px rgba(0,0,0,.62);
+    --edge:inset 0 1px 0 rgba(255,255,255,.06);
+
+    /* Composed, non-bouncy easing — the springs read as playful/childish. */
+    --ease:cubic-bezier(.22,.61,.36,1);
+
+    --font-display:'Space Grotesk', 'Segoe UI', sans-serif;
     --font-body:'Inter', Arial, Helvetica, sans-serif;
     --font-mono:'JetBrains Mono', 'Courier New', monospace;
 }
@@ -42,7 +50,13 @@
 
 body {
     font-family:var(--font-body);
-    background:linear-gradient(180deg, var(--bg-deep), var(--bg));
+    /* Two faint colour washes (accent top-left, primary top-right) over the
+       vertical base gradient — ambient depth, fixed so it doesn't scroll. */
+    background:
+        radial-gradient(1100px 620px at 12% -8%, rgba(var(--accent-rgb),.06), transparent 58%),
+        radial-gradient(1000px 700px at 112% 6%, rgba(0,89,79,.20), transparent 55%),
+        linear-gradient(180deg, var(--bg-deep), var(--bg));
+    background-attachment:fixed;
     color:var(--text);
     padding:45px;
 }
@@ -50,9 +64,12 @@ body {
 
 .container { max-width:1300px; margin:auto; }
 
-h1 { font-family:var(--font-display); font-size:2.4rem; font-weight:700; text-transform:uppercase; letter-spacing:1px; }
-h2 { font-family:var(--font-display); margin-bottom:18px; font-size:1.2rem; font-weight:600; text-transform:uppercase; letter-spacing:1px; }
-h3, h4 { font-family:var(--font-display); font-weight:600; letter-spacing:.5px; }
+/* Mixed-case display with tight tracking reads composed and adult; the
+   old all-caps + wide spacing read sporty. Uppercase now survives only on
+   the small eyebrow labels further down (card h2, badges, stat labels). */
+h1 { font-family:var(--font-display); font-size:2.5rem; font-weight:700; letter-spacing:-.02em; line-height:1.05; }
+h2 { font-family:var(--font-display); margin-bottom:18px; font-size:1.3rem; font-weight:600; letter-spacing:-.01em; }
+h3, h4 { font-family:var(--font-display); font-weight:600; letter-spacing:-.01em; }
 
 /* ===== HEADER ===== */
 
@@ -61,26 +78,33 @@ h3, h4 { font-family:var(--font-display); font-weight:600; letter-spacing:.5px; 
 .header-left p { margin-top:8px; color:var(--muted); }
 
 .logo {
-    width:72px; height:72px;
-    border-radius:22px;
+    width:64px; height:64px;
+    border-radius:16px;
     display:flex; justify-content:center; align-items:center;
-    font-size:34px;
-    background:linear-gradient(135deg, var(--primary), var(--accent));
-    box-shadow:0 15px 35px rgba(0,89,79,.45);
+    background:linear-gradient(140deg, var(--surface-light), var(--primary));
+    box-shadow:var(--edge), 0 10px 26px -8px rgba(0,89,79,.55);
+    border:1px solid rgba(var(--accent-rgb),.25);
 }
 
-.logo-text { display:none; font-family:var(--font-display); font-weight:700; color:var(--accent-contrast); font-size:1.3rem; }
+/* A typographic monogram instead of the 🏁 flag — the single biggest
+   "this is a serious tool" cue. Shown everywhere; the emoji is hidden. */
+.logo-text { display:block; font-family:var(--font-display); font-weight:700; color:var(--accent); font-size:1.5rem; letter-spacing:-.03em; }
+
+/* Decorative emoji (flag logo, tab icons) read casual — retire them app-wide.
+   Debt-type glyphs on cards are plain text, not .ico, so they stay. */
+.ico { display:none; }
 
 .settings-button {
-    width:56px; height:56px;
-    border:none; border-radius:18px;
+    width:52px; height:52px;
+    border:1px solid var(--border); border-radius:14px;
     background:var(--surface);
-    color:white; font-size:24px;
+    color:var(--muted); font-size:22px;
     cursor:pointer;
-    transition:.25s;
+    box-shadow:var(--edge);
+    transition:background .25s var(--ease), color .25s var(--ease), transform .35s var(--ease);
 }
-.settings-button:hover { background:var(--primary); transform:rotate(20deg); }
-.settings-button:active { transform:rotate(20deg) scale(.9); }
+.settings-button:hover { background:var(--surface-hover); color:var(--text); transform:rotate(45deg); }
+.settings-button:active { transform:rotate(45deg) scale(.92); }
 
 /* ===== TABS ===== */
 
@@ -89,11 +113,11 @@ h3, h4 { font-family:var(--font-display); font-weight:600; letter-spacing:.5px; 
 .tabs-indicator {
     position:absolute;
     top:0; left:0;
-    border-radius:14px;
+    border-radius:12px;
     background:linear-gradient(135deg, var(--primary), var(--accent));
-    box-shadow:0 8px 20px rgba(0,89,79,.35);
+    box-shadow:var(--edge), 0 8px 20px -4px rgba(0,89,79,.45);
     z-index:0;
-    transition:transform .35s cubic-bezier(.34,1.4,.64,1), width .35s ease, height .35s ease;
+    transition:transform .4s var(--ease), width .4s var(--ease), height .4s var(--ease);
 }
 
 .tab-btn {
@@ -103,18 +127,17 @@ h3, h4 { font-family:var(--font-display); font-weight:600; letter-spacing:.5px; 
     border:1px solid var(--border);
     color:var(--muted);
     padding:12px 22px;
-    border-radius:14px;
+    border-radius:12px;
     font-family:var(--font-display);
-    text-transform:uppercase;
-    letter-spacing:.5px;
-    font-weight:600;
-    font-size:.95rem;
+    letter-spacing:-.01em;
+    font-weight:500;
+    font-size:.98rem;
     cursor:pointer;
-    transition:color .2s, border-color .2s, transform .15s;
+    transition:color .2s var(--ease), border-color .2s var(--ease), transform .2s var(--ease);
 }
-.tab-btn:hover { color:var(--text); border-color:var(--accent); }
-.tab-btn:active { transform:scale(.95); }
-.tab-btn.active { background:transparent; color:var(--text); border-color:transparent; }
+.tab-btn:hover { color:var(--text); border-color:rgba(var(--accent-rgb),.4); }
+.tab-btn:active { transform:scale(.97); }
+.tab-btn.active { background:transparent; color:var(--text); border-color:transparent; font-weight:600; }
 
 .tab-content { display:none; }
 .tab-content.active { display:block; animation:tabFadeIn .35s ease; }
@@ -152,14 +175,15 @@ h3, h4 { font-family:var(--font-display); font-weight:600; letter-spacing:.5px; 
 
 .card {
     container-type:inline-size;
+    position:relative;
     background:linear-gradient(145deg, var(--surface), var(--surface-light));
     border:1px solid var(--border);
     border-radius:var(--radius);
     padding:28px;
-    box-shadow:var(--shadow);
-    transition:.25s;
+    box-shadow:var(--edge), var(--shadow);
+    transition:transform .3s var(--ease), box-shadow .3s var(--ease), border-color .3s var(--ease);
 }
-.card:hover { transform:translateY(-5px); }
+.card:hover { transform:translateY(-4px); box-shadow:var(--edge), var(--shadow-lg); border-color:rgba(var(--accent-rgb),.35); }
 
 .summary .card {
     opacity:0;
@@ -218,14 +242,14 @@ h3, h4 { font-family:var(--font-display); font-weight:600; letter-spacing:.5px; 
 .debt-card {
     background:linear-gradient(160deg, var(--surface), var(--surface-light));
     border:1px solid var(--border);
-    border-top:3px solid var(--accent);
-    border-radius:24px;
+    border-top:2px solid var(--accent);
+    border-radius:var(--radius);
     padding:26px;
-    box-shadow:var(--shadow);
-    transition:transform .25s ease, box-shadow .25s ease;
-    animation:cardFade .35s ease;
+    box-shadow:var(--edge), var(--shadow);
+    transition:transform .3s var(--ease), box-shadow .3s var(--ease), border-color .3s var(--ease);
+    animation:cardFade .35s var(--ease);
 }
-.debt-card:hover { transform:translateY(-6px); box-shadow:0 25px 55px rgba(0,0,0,.5); }
+.debt-card:hover { transform:translateY(-5px); box-shadow:var(--edge), var(--shadow-lg); border-color:rgba(var(--accent-rgb),.4); }
 
 .priority-debt { animation:cardFade .35s ease, priorityPulse 2.4s ease-in-out infinite; }
 
@@ -509,8 +533,8 @@ h3, h4 { font-family:var(--font-display); font-weight:600; letter-spacing:.5px; 
     border:1px solid var(--border);
     border-radius:22px;
     padding:30px;
-    box-shadow:var(--shadow);
-    animation:modalPopIn .3s cubic-bezier(.34,1.56,.64,1);
+    box-shadow:var(--edge), var(--shadow-lg);
+    animation:modalPopIn .32s var(--ease);
 }
 
 /* The close button stays position:absolute (outside normal flow) so
@@ -1344,3 +1368,80 @@ body { transition:background .4s ease, color .4s ease; }
 .pg-dot { fill:var(--accent); stroke:var(--surface); stroke-width:1.5; transition:none; }
 .pg-ylab { fill:var(--muted); font-family:var(--font-body); font-size:22px; text-anchor:end; }
 .pg-xlab { fill:var(--muted); font-family:var(--font-body); font-size:22px; }
+
+/* =========================================
+   MOTION & IDENTITY LAYER — 2026-08-01 redesign
+   Orchestrated entrance, the chart drawing itself,
+   and the two layouts that needed a stronger point
+   of view. Appended last to win source order.
+========================================= */
+
+@keyframes riseIn { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+
+/* Page loads as a composed sequence, not all-at-once: brand, then nav,
+   then the dashboard blocks fall in behind the already-staggered cards. */
+.app-header { animation:riseIn .55s var(--ease) both; }
+.tabs { animation:riseIn .55s var(--ease) .06s both; }
+.advisor-section { animation:riseIn .55s var(--ease) .16s both; }
+.progress-section:not(.hidden) { animation:riseIn .55s var(--ease) .22s both; }
+#tab-dashboard > h2 { animation:riseIn .55s var(--ease) .28s both; }
+.add-debt { animation:riseIn .55s var(--ease) .34s both; }
+
+/* ----- The signature: the progress line draws itself ----- */
+@keyframes pgDraw { to { stroke-dashoffset:0; } }
+@keyframes pgFade { from { opacity:0; } to { opacity:1; } }
+.pg-line { stroke-dasharray:1; stroke-dashoffset:1; animation:pgDraw 1.15s var(--ease) .15s forwards; }
+.pg-area { animation:pgFade .9s var(--ease) .55s both; }
+.pg-dot  { animation:pgFade .35s var(--ease) 1.05s both; }
+
+/* ----- Light sweep across primary CTAs on hover (no body text beneath) ----- */
+.planner-button { position:relative; overflow:hidden; }
+.planner-button::after {
+    content:""; position:absolute; inset:0; pointer-events:none;
+    background:linear-gradient(115deg, transparent 32%, rgba(255,255,255,.22) 50%, transparent 68%);
+    transform:translateX(-130%);
+    transition:transform .6s var(--ease);
+}
+.planner-button:hover::after { transform:translateX(130%); }
+
+/* ===== CORPORATE — private-bank serif gravitas ===== */
+html[data-layout="corporate"] h1,
+html[data-layout="corporate"] h2,
+html[data-layout="corporate"] h3,
+html[data-layout="corporate"] h4,
+html[data-layout="corporate"] .plan-lender h4,
+html[data-layout="corporate"] .payment-row-info h4,
+html[data-layout="corporate"] .debt-top h3 {
+    font-family:'Fraunces', Georgia, serif;
+    font-weight:600;
+    letter-spacing:normal;
+}
+html[data-layout="corporate"] h1 { font-weight:700; font-size:2.3rem; }
+html[data-layout="corporate"] .app-header { border-bottom:1px solid var(--border); padding-bottom:26px; }
+
+/* ===== ANALYST TERMINAL — trading-desk texture ===== */
+html[data-layout="terminal"] body {
+    background:
+        repeating-linear-gradient(rgba(var(--accent-rgb),.035) 0 1px, transparent 1px 3px),
+        linear-gradient(180deg, var(--bg-deep), var(--bg));
+}
+html[data-layout="terminal"] .card,
+html[data-layout="terminal"] .debt-card,
+html[data-layout="terminal"] .plan-card {
+    background:
+        linear-gradient(rgba(var(--accent-rgb),.03) 1px, transparent 1px) 0 0 / 100% 22px,
+        var(--bg);
+    border-top:1px solid var(--accent);
+    box-shadow:var(--edge);
+}
+
+/* ===== Reduced motion — quality floor ===== */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration:.001ms !important;
+        animation-iteration-count:1 !important;
+        transition-duration:.001ms !important;
+        scroll-behavior:auto !important;
+    }
+    .pg-line { stroke-dashoffset:0 !important; }
+}

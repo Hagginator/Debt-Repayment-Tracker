@@ -128,7 +128,7 @@ function renderProgressChart() {
 <svg viewBox="0 0 ${W} ${H}" class="pg-svg" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Total debt over time">
     ${grid}
     <path d="${areaPath}" class="pg-area"/>
-    <path d="${linePath}" class="pg-line"/>
+    <path d="${linePath}" class="pg-line" pathLength="1"/>
     ${dots}
     <text x="${padL}" y="${H - 12}" class="pg-xlab" style="text-anchor:start">${fmtDate(t0)}</text>
     <text x="${W - padR}" y="${H - 12}" class="pg-xlab" style="text-anchor:end">${fmtDate(t1)}</text>
