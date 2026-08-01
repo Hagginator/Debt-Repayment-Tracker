@@ -1682,53 +1682,90 @@ html[data-layout="glass"] .app-bg-grid { display:none; }
 html[data-layout="glass"] .card:hover,
 html[data-layout="glass"] .insight-card:hover { background:rgba(255,255,255,.10); }
 
-/* ===== 3. INDUSTRIAL — graphite + orange, bold and technical ===== */
-html[data-layout="industrial"] {
-    --bg-deep:#080808;
-    --bg:#0D0D0D;
-    --surface:#161616;
-    --surface-light:#1E1E1E;
-    --surface-hover:#282828;
-
-    --primary:#8A3408;
-    --primary-hover:#B54410;
-    --accent:#FF6A1A;
-    --accent-rgb:255,106,26;
-    --accent-contrast:#0D0D0D;
-
-    --success:#3DD68C;
-    --warning:#FFC53D;
-    --danger:#FF4D4D;
-
-    --text:#F2F2F2;
-    --muted:#8A8A8A;
-    --border:rgba(255,255,255,.10);
-
-    --radius:8px;
-    --shadow:0 1px 2px rgba(0,0,0,.5), 0 14px 30px -12px rgba(0,0,0,.75);
-    --shadow-lg:0 2px 6px rgba(0,0,0,.55), 0 36px 64px -18px rgba(0,0,0,.85);
-    --edge:inset 0 1px 0 rgba(255,255,255,.05);
-    --font-display:'Space Grotesk', 'Segoe UI', sans-serif;
-}
-/* Technical voice: condensed uppercase headings and labels. */
-html[data-layout="industrial"] h1,
-html[data-layout="industrial"] h2,
-html[data-layout="industrial"] .topbar-title h1,
-html[data-layout="industrial"] .brand-text strong {
-    text-transform:uppercase;
-    letter-spacing:.04em;
-    font-weight:700;
-}
-html[data-layout="industrial"] .card h2 { letter-spacing:.1em; }
-html[data-layout="industrial"] .app-bg-blob { opacity:.20; }
-html[data-layout="industrial"] .app-bg-grid { opacity:.7; background-size:34px 34px; }
-/* Machined top edge on the panels. */
-html[data-layout="industrial"] .card,
-html[data-layout="industrial"] .insight-card,
-html[data-layout="industrial"] .debt-card { border-top:2px solid var(--accent); }
-html[data-layout="industrial"] .pg-line { filter:drop-shadow(0 0 5px rgba(var(--accent-rgb),.6)); }
-
 /* Reduced motion: stop the background drifting too. */
 @media (prefers-reduced-motion: reduce) {
     .app-bg-blob { animation:none !important; }
 }
+
+/* =========================================================================
+   POLISH — hierarchy on the Overview, and depth work on the two themes.
+   Six identical tiles read flat; the total owed is the number that matters,
+   so it becomes the hero and everything else sits underneath it.
+========================================================================= */
+
+@media (min-width:901px) {
+    .summary { grid-template-columns:repeat(3, 1fr); align-items:stretch; }
+
+    /* Total Debt: hero, two columns wide and two rows tall. */
+    .summary .card:first-child {
+        grid-column:span 2;
+        grid-row:span 2;
+        display:flex;
+        flex-direction:column;
+        justify-content:center;
+        gap:6px;
+        padding:34px 36px;
+        position:relative;
+        overflow:hidden;
+    }
+    .summary .card:first-child h2 {
+        min-height:0;
+        justify-content:flex-start;
+        text-align:left;
+        font-size:.74rem;
+        letter-spacing:.12em;
+        margin:0;
+    }
+    .summary .card:first-child p {
+        font-size:clamp(2.6rem, 6vw, 4.2rem);
+        text-align:left;
+        line-height:1;
+        letter-spacing:-.03em;
+    }
+    /* A soft accent bloom in the corner — depth without decoration. */
+    .summary .card:first-child::after {
+        content:"";
+        position:absolute;
+        width:340px; height:340px;
+        right:-120px; bottom:-160px;
+        border-radius:50%;
+        background:var(--accent);
+        opacity:.14;
+        filter:blur(60px);
+        pointer-events:none;
+    }
+}
+
+/* ---- Fintech: a hairline of accent along the hero's top edge ---- */
+html[data-layout="fintech"] .summary .card:first-child {
+    border-top:1px solid color-mix(in srgb, var(--accent) 55%, transparent);
+}
+
+/* ---- Glass: sell the material ----
+   Real frosted glass has a bright lit rim along the top and a faint
+   sheen across the surface. Without them the panels read as flat
+   translucent rectangles rather than glass. */
+html[data-layout="glass"] .card,
+html[data-layout="glass"] .insight-card,
+html[data-layout="glass"] .debt-card,
+html[data-layout="glass"] .progress-section,
+html[data-layout="glass"] .modal {
+    position:relative;
+}
+html[data-layout="glass"] .card::before,
+html[data-layout="glass"] .insight-card::before,
+html[data-layout="glass"] .debt-card::before,
+html[data-layout="glass"] .progress-section::before,
+html[data-layout="glass"] .modal::before {
+    content:"";
+    position:absolute;
+    inset:0;
+    border-radius:inherit;
+    pointer-events:none;
+    background:linear-gradient(150deg, rgba(255,255,255,.16), rgba(255,255,255,0) 46%);
+}
+/* Keep body copy readable on the lighter frosted surface. */
+html[data-layout="glass"] { --muted:#B7C4DA; }
+html[data-layout="glass"] .insight-card-body p,
+html[data-layout="glass"] .page-lede,
+html[data-layout="glass"] .settings-hint { color:#C2CEE2; }

@@ -8,7 +8,7 @@
 ========================================= */
 
 const DEFAULT_LAYOUT = "fintech";
-const VALID_LAYOUTS = ["fintech", "glass", "industrial"];
+const VALID_LAYOUTS = ["fintech", "glass"];
 
 function applyLayout(name) {
     document.documentElement.dataset.layout = name;
