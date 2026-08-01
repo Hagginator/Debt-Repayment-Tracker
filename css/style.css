@@ -1366,8 +1366,8 @@ body { transition:background .4s ease, color .4s ease; }
 .pg-area { fill:var(--accent); opacity:.15; stroke:none; }
 .pg-grid { stroke:var(--border); stroke-width:1; vector-effect:non-scaling-stroke; }
 .pg-dot { fill:var(--accent); stroke:var(--surface); stroke-width:1.5; transition:none; }
-.pg-ylab { fill:var(--muted); font-family:var(--font-body); font-size:22px; text-anchor:end; }
-.pg-xlab { fill:var(--muted); font-family:var(--font-body); font-size:22px; }
+.pg-ylab { fill:var(--muted); font-family:var(--font-body); font-size:14px; text-anchor:end; }
+.pg-xlab { fill:var(--muted); font-family:var(--font-body); font-size:14px; }
 
 /* =========================================
    MOTION & IDENTITY LAYER — 2026-08-01 redesign
@@ -1390,8 +1390,11 @@ body { transition:background .4s ease, color .4s ease; }
 /* ----- The signature: the progress line draws itself ----- */
 @keyframes pgDraw { to { stroke-dashoffset:0; } }
 @keyframes pgFade { from { opacity:0; } to { opacity:1; } }
+/* Fade the area in TO its 15% tint — animating plain opacity to 1 (as pgFade
+   does) was overriding the .15 and rendering a solid slab. */
+@keyframes pgAreaIn { from { opacity:0; } to { opacity:.15; } }
 .pg-line { stroke-dasharray:1; stroke-dashoffset:1; animation:pgDraw 1.15s var(--ease) .15s forwards; }
-.pg-area { animation:pgFade .9s var(--ease) .55s both; }
+.pg-area { animation:pgAreaIn .9s var(--ease) .55s both; }
 .pg-dot  { animation:pgFade .35s var(--ease) 1.05s both; }
 
 /* ----- Light sweep across primary CTAs on hover (no body text beneath) ----- */

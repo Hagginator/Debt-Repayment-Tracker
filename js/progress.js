@@ -11,9 +11,11 @@
 // reversing their oldest history entry; anything with no history at all
 // just uses its current balance.
 function debtStartingBalance(debt) {
-    if (debt.type === "loan") return Number(debt.originalTotal ?? debt.balance) || 0;
-
     const history = debt.history || [];
+    // No logged history → no information about past movement, so treat the
+    // debt as flat at its current balance. (Anchoring a loan on originalTotal
+    // instead dropped a false cliff at "today", since we don't know when the
+    // paydown actually happened.)
     if (history.length === 0) return Number(debt.balance) || 0;
 
     // history is stored newest-first, so the last element is the oldest.
@@ -25,26 +27,23 @@ function debtStartingBalance(debt) {
         : after - Number(oldest.amount);
 }
 
-// When a debt started being tracked: explicit createdAt if present, else
-// its oldest history entry, else now (nothing dated to go on).
-function debtStartMs(debt) {
-    if (debt.createdAt) return new Date(debt.createdAt).getTime();
-    const history = debt.history || [];
-    if (history.length) return new Date(history[history.length - 1].date).getTime();
-    return Date.now();
-}
-
-// Reconstructs [{ t, total }] for the SUM of every debt over time. A debt
-// contributes nothing before its start, then its starting balance, then
-// steps to each logged balanceAfter in turn. The final point uses the live
-// balances so any un-logged edit still lands the line on today's real total.
+// Reconstructs [{ t, total }] for the SUM of every debt over time. Every debt
+// is present across the whole window at its starting balance, then steps to
+// each logged balanceAfter. The final point uses live balances so an un-logged
+// edit still lands the line on today's real total.
+//
+// The window starts at the earliest dated moment we know of (a logged payment,
+// or a debt's createdAt), minus a day so the first logged payment reads as a
+// visible step down rather than a line that begins already-reduced. Debts are
+// NOT made to "appear" at their createdAt — that just produced confusing jumps;
+// creation only affects where the window begins.
 function buildDebtTimeline(list = debts) {
     if (!list.length) return [];
 
     const now = Date.now();
 
     const series = list.map(d => ({
-        start: debtStartMs(d),
+        createdAt: d.createdAt ? new Date(d.createdAt).getTime() : null,
         startBal: debtStartingBalance(d),
         cur: Number(d.balance) || 0,
         events: (d.history || [])
@@ -52,15 +51,20 @@ function buildDebtTimeline(list = debts) {
             .sort((a, b) => a.t - b.t)
     }));
 
-    // Every timestamp we need a plotted point at.
-    const times = new Set([now]);
-    series.forEach(s => { times.add(s.start); s.events.forEach(e => times.add(e.t)); });
+    let windowStart = now;
+    series.forEach(s => {
+        if (s.createdAt !== null) windowStart = Math.min(windowStart, s.createdAt);
+        if (s.events.length) windowStart = Math.min(windowStart, s.events[0].t);
+    });
+    if (windowStart < now) windowStart -= 86400000;
+
+    const times = new Set([now, windowStart]);
+    series.forEach(s => s.events.forEach(e => times.add(e.t)));
     const sorted = [...times].sort((a, b) => a - b);
 
     return sorted.map(t => {
         let total = 0;
         for (const s of series) {
-            if (t < s.start) continue;            // debt didn't exist yet
             if (t >= now) { total += s.cur; continue; } // trust live balance at the end
             let bal = s.startBal;
             for (const e of s.events) {
@@ -87,8 +91,12 @@ function renderProgressChart() {
     }
     host.classList.remove("hidden");
 
-    const W = 1000, H = 380;
-    const padL = 70, padR = 18, padT = 18, padB = 40;
+    // Match the viewBox to the container width and a fixed banner height, so
+    // 1 SVG unit ≈ 1px — the chart stays a sensible height on any screen
+    // instead of scaling its aspect ratio up to something enormous when wide.
+    const W = Math.max(Math.round(host.clientWidth) || 960, 320);
+    const H = 300;
+    const padL = 64, padR = 18, padT = 20, padB = 38;
 
     const t0 = points[0].t;
     const t1 = points[points.length - 1].t;
@@ -150,3 +158,10 @@ function _pgSelfTest() {
     console.assert(Math.abs(tl[tl.length - 1].total - (200 + 300)) < 0.01, "end total should be 500, got " + tl[tl.length - 1].total);
     console.log("progress self-test passed", tl);
 }
+
+// The viewBox width now tracks the container, so redraw on resize (debounced).
+let _pgResizeTimer;
+window.addEventListener("resize", () => {
+    clearTimeout(_pgResizeTimer);
+    _pgResizeTimer = setTimeout(renderProgressChart, 150);
+});
