@@ -1769,3 +1769,123 @@ html[data-layout="glass"] { --muted:#B7C4DA; }
 html[data-layout="glass"] .insight-card-body p,
 html[data-layout="glass"] .page-lede,
 html[data-layout="glass"] .settings-hint { color:#C2CEE2; }
+
+/* =========================================================================
+   MOTION SYSTEM
+   One shared easing/duration scale, so every moving thing in the app looks
+   related. Transform and opacity only — those run on the compositor, which
+   is what makes it feel streamlined rather than merely animated.
+========================================================================= */
+
+:root {
+    --dur-1:.22s;    /* micro: hovers, presses */
+    --dur-2:.42s;    /* content entering */
+    --dur-3:.62s;    /* the page itself */
+    --ease-out:cubic-bezier(.16,.84,.44,1);   /* decisive arrival */
+    --ease-soft:cubic-bezier(.4,0,.2,1);      /* symmetric, for glides */
+    --stagger:52ms;
+}
+
+/* ---- Page change: the container carries a soft fade, the CONTENT carries
+   the movement, cascading in. One page reads as a single object arriving. ---- */
+.tab-content.active { animation:pageFade var(--dur-3) var(--ease-out) both; }
+@keyframes pageFade { from { opacity:0; } to { opacity:1; } }
+
+.tab-content.active > *:not(.summary) {
+    animation:contentUp var(--dur-2) var(--ease-out) both;
+}
+.pages.nav-back .tab-content.active > *:not(.summary) { animation-name:contentDown; }
+
+@keyframes contentUp   { from { opacity:0; transform:translate3d(0,22px,0); } to { opacity:1; transform:none; } }
+@keyframes contentDown { from { opacity:0; transform:translate3d(0,-22px,0); } to { opacity:1; transform:none; } }
+
+/* Cascade — each block follows the one above it. */
+.tab-content.active > *:nth-child(1) { animation-delay:calc(var(--stagger) * 0); }
+.tab-content.active > *:nth-child(2) { animation-delay:calc(var(--stagger) * 1); }
+.tab-content.active > *:nth-child(3) { animation-delay:calc(var(--stagger) * 2); }
+.tab-content.active > *:nth-child(4) { animation-delay:calc(var(--stagger) * 3); }
+.tab-content.active > *:nth-child(5) { animation-delay:calc(var(--stagger) * 4); }
+.tab-content.active > *:nth-child(6) { animation-delay:calc(var(--stagger) * 5); }
+
+/* Summary tiles cascade individually — the hero lands first, the small
+   tiles follow it in reading order. */
+.tab-content.active .summary .card {
+    opacity:0;
+    animation:tileIn var(--dur-2) var(--ease-out) both;
+}
+@keyframes tileIn { from { opacity:0; transform:translate3d(0,20px,0) scale(.985); } to { opacity:1; transform:none; } }
+.tab-content.active .summary .card:nth-child(1) { animation-delay:40ms; }
+.tab-content.active .summary .card:nth-child(2) { animation-delay:96ms; }
+.tab-content.active .summary .card:nth-child(3) { animation-delay:140ms; }
+.tab-content.active .summary .card:nth-child(4) { animation-delay:184ms; }
+.tab-content.active .summary .card:nth-child(5) { animation-delay:228ms; }
+.tab-content.active .summary .card:nth-child(6) { animation-delay:272ms; }
+
+/* Insight cards cascade within their row too. */
+.insight-strip .insight-card:nth-child(1) { animation-delay:.20s; }
+.insight-strip .insight-card:nth-child(2) { animation-delay:.27s; }
+.insight-strip .insight-card:nth-child(3) { animation-delay:.34s; }
+#insightsFull .insight-card:nth-child(n)  { animation-duration:var(--dur-2); }
+
+/* ---- Nav: a pill that glides between items ---- */
+.sidebar .tabs { position:relative; }
+.nav-indicator {
+    position:absolute;
+    top:0; left:0;
+    border-radius:11px;
+    background:var(--surface-light);
+    border:1px solid var(--border);
+    box-shadow:var(--edge);
+    opacity:0;
+    z-index:0;
+    pointer-events:none;
+    transition:transform .46s var(--ease-soft), width .46s var(--ease-soft), height .46s var(--ease-soft), opacity .2s linear;
+}
+.sidebar .tab-btn { position:relative; z-index:1; }
+/* The pill now provides the active background, so the button doesn't. */
+.sidebar .tab-btn.active { background:transparent; border-color:transparent; box-shadow:none; }
+/* A thin accent marker rides the active item. */
+.nav-indicator::before {
+    content:"";
+    position:absolute;
+    left:0; top:50%;
+    width:3px; height:18px;
+    margin-top:-9px;
+    border-radius:0 3px 3px 0;
+    background:var(--accent);
+}
+
+/* ---- Page title swap ---- */
+.title-swap { animation:titleSwap .5s var(--ease-out); }
+@keyframes titleSwap {
+    from { opacity:0; transform:translate3d(0,10px,0); letter-spacing:.02em; }
+    to   { opacity:1; transform:none; }
+}
+
+/* ---- Micro-interactions: quick in, gentle out ---- */
+.sd-row { transition:background var(--dur-1) var(--ease-out), transform var(--dur-1) var(--ease-out); }
+.sd-row:hover { transform:translateX(3px); }
+.sidebar .tab-btn { transition:color var(--dur-1) var(--ease-out), transform var(--dur-1) var(--ease-out); }
+.sidebar .tab-btn:hover:not(.active) { transform:translateX(3px); }
+.settings-button:active, .planner-button:active, .log-payment-btn:active,
+#addDebtButton:active, .settings-btn:active { transform:scale(.96); }
+
+/* The hero's accent bloom breathes — slow enough to feel ambient, not busy. */
+@keyframes bloomPulse { 0%,100% { opacity:.12; transform:scale(1); } 50% { opacity:.2; transform:scale(1.1); } }
+@media (min-width:901px) {
+    .summary .card:first-child::after { animation:bloomPulse 9s var(--ease-soft) infinite; }
+}
+
+/* ---- Chart: draw in after the tiles have landed ---- */
+.pg-line { animation-duration:1.1s; animation-delay:.34s; }
+.pg-area { animation-delay:.72s; }
+.pg-dot  { animation-delay:1.18s; }
+
+@media (prefers-reduced-motion: reduce) {
+    .tab-content.active,
+    .tab-content.active > *,
+    .tab-content.active .summary .card,
+    .insight-card, .title-swap { animation:none !important; opacity:1 !important; transform:none !important; }
+    .nav-indicator { transition:none !important; }
+    .summary .card:first-child::after { animation:none !important; }
+}
