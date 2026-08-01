@@ -80,4 +80,9 @@ function updateSummary() {
     // Redraw the debt-over-time chart whenever the totals move — covers
     // load, payments, charges, edits, add and delete in one hook.
     if (typeof renderProgressChart === "function") renderProgressChart();
+    if (typeof renderSidebarDebts === "function") renderSidebarDebts();
+    if (typeof renderInsights === "function") renderInsights();
+
+    const topbarTotal = document.getElementById("topbarTotal");
+    if (topbarTotal) topbarTotal.textContent = "£" + totalDebt.toFixed(2);
 }

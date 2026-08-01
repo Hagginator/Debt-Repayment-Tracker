@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-layout="fintech">
 
 <head>
 
@@ -9,7 +9,7 @@
     <title>Debt Manager</title>
 
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#00594F">
+    <meta name="theme-color" content="#0B0B12">
 
     <link rel="icon" href="icons/icon-192.png">
     <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
@@ -17,337 +17,264 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Debt Manager">
 
-    <link rel="stylesheet" href="css/style.css?v=52">
+    <link rel="stylesheet" href="css/style.css?v=53">
 
 </head>
 
 <body>
 
-    <div class="container">
+    <!-- Animated ambient background, sits behind everything -->
+    <div class="app-bg" aria-hidden="true">
+        <span class="app-bg-blob b1"></span>
+        <span class="app-bg-blob b2"></span>
+        <span class="app-bg-blob b3"></span>
+        <span class="app-bg-grid"></span>
+    </div>
+
+    <div class="app">
 
         <!-- ==========================
-             HEADER
+             SIDEBAR
         =========================== -->
+        <aside class="sidebar">
 
-        <header class="app-header">
-
-            <div class="header-left">
-
-                <div class="logo">
-                    <span class="ico">🏁</span>
-                    <span class="logo-text">DM</span>
+            <div class="brand">
+                <div class="logo"><span class="ico">🏁</span><span class="logo-text">DM</span></div>
+                <div class="brand-text">
+                    <strong>Debt Manager</strong>
+                    <span>Your payoff, on track</span>
                 </div>
-
-                <div>
-
-                    <h1>Debt Manager</h1>
-
-                    <p>
-                        Track debts. Reduce interest. Become debt free.
-                    </p>
-
-                </div>
-
             </div>
 
-            <button class="settings-button" onclick="openSettingsModal()">
-                ⚙️
+            <nav class="tabs" aria-label="Primary">
+                <button class="tab-btn active" data-tab="overview" onclick="switchTab('overview')">
+                    <span class="nav-ico">◧</span> Overview
+                </button>
+                <button class="tab-btn" data-tab="debts" onclick="switchTab('debts')">
+                    <span class="nav-ico">▤</span> Debts
+                </button>
+                <button class="tab-btn" data-tab="payments" onclick="switchTab('payments')">
+                    <span class="nav-ico">＄</span> Log Payment
+                </button>
+                <button class="tab-btn" data-tab="planner" onclick="switchTab('planner')">
+                    <span class="nav-ico">◈</span> Planner
+                </button>
+                <button class="tab-btn" data-tab="insights" onclick="switchTab('insights')">
+                    <span class="nav-ico">✦</span> Insights
+                </button>
+            </nav>
+
+            <div class="sidebar-debts">
+                <div class="sidebar-debts-head">
+                    <span>Your debts</span>
+                    <span class="sidebar-debts-count" id="sidebarDebtsCount">0</span>
+                </div>
+                <div id="sidebarDebts"></div>
+            </div>
+
+            <button class="pro-cta" onclick="switchTab('insights')">
+                <span class="pro-cta-ico">✦</span>
+                <span class="pro-cta-text">
+                    <strong>See your insights</strong>
+                    <small>Auto-summary of where you stand</small>
+                </span>
             </button>
 
-        </header>
+        </aside>
 
         <!-- ==========================
-             TABS
+             MAIN
         =========================== -->
+        <main class="main">
 
-        <div class="tabs">
-            <div class="tabs-indicator" id="tabsIndicator"></div>
-            <button class="tab-btn active" data-tab="dashboard" onclick="switchTab('dashboard')"><span class="ico">📊</span> Dashboard</button>
-            <button class="tab-btn" data-tab="payments" onclick="switchTab('payments')"><span class="ico">💷</span> Log Payment</button>
-            <button class="tab-btn" data-tab="planner" onclick="switchTab('planner')"><span class="ico">🗺️</span> Planner</button>
-        </div>
-
-        <!-- ==========================
-             DASHBOARD TAB
-        =========================== -->
-
-        <div id="tab-dashboard" class="tab-content active">
-
-            <div id="promoBanner"></div>
-
-            <div class="summary">
-
-                <div class="card">
-                    <h2>Total Debt</h2>
-                    <p id="totalDebt">£0.00</p>
+            <header class="topbar">
+                <div class="topbar-title">
+                    <h1 id="pageTitle">Overview</h1>
+                    <p id="pageSubtitle">Everything you owe, and how it's moving.</p>
                 </div>
-
-                <div class="card">
-                    <h2>Monthly Interest</h2>
-                    <p id="monthlyInterest">£0.00</p>
+                <div class="topbar-actions">
+                    <div class="topbar-total">
+                        <span>Total owed</span>
+                        <strong id="topbarTotal">£0.00</strong>
+                    </div>
+                    <button class="settings-button" onclick="openSettingsModal()" aria-label="Settings">⚙️</button>
                 </div>
+            </header>
 
-                <div class="card">
-                    <h2>Total Credit Limit</h2>
-                    <p id="creditLimit">£0.00</p>
-                </div>
+            <div class="pages">
 
-                <div class="card">
-                    <h2>Overall Utilisation</h2>
-                    <p id="utilisation">0%</p>
-                </div>
+                <!-- ===== OVERVIEW ===== -->
+                <section id="tab-overview" class="tab-content active">
 
-                <div class="card">
-                    <h2>Total Minimum Payments</h2>
-                    <p id="minimumPayments">£0.00</p>
-                </div>
+                    <div id="promoBanner"></div>
 
-                <div class="card">
-                    <h2>Debt Free</h2>
-                    <p id="debtFree">--</p>
-                </div>
+                    <div class="summary">
+                        <div class="card">
+                            <h2>Total Debt</h2>
+                            <p id="totalDebt">£0.00</p>
+                        </div>
+                        <div class="card">
+                            <h2>Monthly Interest</h2>
+                            <p id="monthlyInterest">£0.00</p>
+                        </div>
+                        <div class="card">
+                            <h2>Total Credit Limit</h2>
+                            <p id="creditLimit">£0.00</p>
+                        </div>
+                        <div class="card">
+                            <h2>Overall Utilisation</h2>
+                            <p id="utilisation">0%</p>
+                        </div>
+                        <div class="card">
+                            <h2>Total Minimum Payments</h2>
+                            <p id="minimumPayments">£0.00</p>
+                        </div>
+                        <div class="card">
+                            <h2>Debt Free</h2>
+                            <p id="debtFree">--</p>
+                        </div>
+                    </div>
 
-            </div>
+                    <div class="progress-section hidden" id="progressChart"></div>
 
-            <div class="progress-section hidden" id="progressChart"></div>
+                    <div class="insight-strip" id="insightsSummary"></div>
 
-            <div class="advisor-section">
-                <h2>Thinking About a Purchase?</h2>
-                <p class="settings-hint">Tell me how much and I'll tell you which card does the least damage.</p>
-                <div class="advisor-row">
-                    <input type="number" id="purchaseAmount" min="0" step="1" placeholder="e.g. 500">
-                    <button class="planner-button" onclick="renderPurchaseAdvice()">Ask</button>
-                </div>
-                <div id="purchaseAdviceResult"></div>
-            </div>
+                    <div class="advisor-section">
+                        <h2>Thinking About a Purchase?</h2>
+                        <p class="settings-hint">Tell me how much and I'll tell you which card does the least damage.</p>
+                        <div class="advisor-row">
+                            <input type="number" id="purchaseAmount" min="0" step="1" placeholder="e.g. 500">
+                            <button class="planner-button" onclick="renderPurchaseAdvice()">Ask</button>
+                        </div>
+                        <div id="purchaseAdviceResult"></div>
+                    </div>
 
-            <h2>Your Debts</h2>
+                </section>
 
-            <div class="add-debt">
+                <!-- ===== DEBTS ===== -->
+                <section id="tab-debts" class="tab-content">
 
-                <select id="debtType" onchange="toggleDebtTypeFields()" title="A card is revolving credit with a flexible balance; a loan has a fixed payment over a fixed term.">
-                    <option value="card">💳 Credit Card</option>
-                    <option value="loan">🏦 Loan</option>
-                </select>
+                    <h2>Your Debts</h2>
 
-                <input
-                    type="text"
-                    id="lender"
-                    placeholder="Lender">
+                    <div class="add-debt">
 
-                <input
-                    type="number"
-                    id="balance"
-                    placeholder="Balance">
-
-                <input
-                    type="number"
-                    id="apr"
-                    placeholder="APR">
-
-                <input
-                    type="number"
-                    id="totalRepayable"
-                    class="loan-field hidden"
-                    step="0.01"
-                    title="The total amount you'll repay over the loan — straight off your loan agreement. This is what the tracker counts down."
-                    placeholder="Total repayable">
-
-                <input
-                    type="number"
-                    id="loanMonthly"
-                    class="loan-field hidden"
-                    step="0.01"
-                    title="Your actual fixed monthly payment, off the agreement."
-                    placeholder="Monthly payment">
-
-                <input
-                    type="number"
-                    id="termMonths"
-                    class="loan-field hidden"
-                    min="1"
-                    step="1"
-                    title="How many months the loan runs for."
-                    placeholder="Term (months)">
-
-                <input
-                    type="number"
-                    id="limit"
-                    class="card-field"
-                    placeholder="Credit Limit">
-
-                <input
-                    type="number"
-                    id="minimum"
-                    class="card-field"
-                    placeholder="Min Payment">
-
-                <input
-                    type="number"
-                    id="minPercent"
-                    class="card-field"
-                    step="0.1"
-                    title="Optional — most cards require the greater of this % of your balance or the flat Min Payment above. Leave blank to always use the flat amount."
-                    placeholder="Min % (optional)">
-
-                <input
-                    type="number"
-                    id="promoApr"
-                    class="card-field"
-                    title="Optional — leave blank if this card has no 0% promo"
-                    placeholder="Promo APR %">
-
-                <input
-                    type="date"
-                    id="promoEndDate"
-                    class="card-field"
-                    placeholder="Promo Ends (optional)">
-
-                <input
-                    type="number"
-                    id="fixedPayment"
-                    class="card-field"
-                    title="Optional — the amount you actually pay each month, if more than the minimum"
-                    placeholder="Fixed Payment">
-
-                <button
-                    id="addDebtButton"
-                    onclick="addDebt()">
-
-                    Add Debt
-
-                </button>
-
-                <button
-                    id="cancelEditButton"
-                    class="hidden"
-                    onclick="cancelEdit()">
-
-                    Cancel
-
-                </button>
-
-            </div>
-
-            <div id="debts"></div>
-
-        </div>
-
-        <!-- ==========================
-             PAYMENTS TAB
-        =========================== -->
-
-        <div id="tab-payments" class="tab-content">
-
-            <h2>Log a Payment</h2>
-            <p style="color:var(--muted);font-size:.9rem;margin-bottom:24px;">
-                Made a payment this month? Log it here and your balances update straight away.
-            </p>
-
-            <div id="paymentsList"></div>
-
-        </div>
-
-        <!-- ==========================
-             PLANNER TAB
-        =========================== -->
-
-        <div id="tab-planner" class="tab-content">
-
-            <h2>Repayment Planner</h2>
-
-            <div class="planner">
-
-                <div class="planner-budget">
-
-                    <label for="monthlyBudget">
-                        Monthly Budget
-                    </label>
-
-                    <input
-                        type="number"
-                        id="monthlyBudget"
-                        placeholder="£350">
-
-                </div>
-
-                <div class="planner-strategy">
-
-                    <label for="strategy">
-                        Repayment Strategy
-                    </label>
-
-                    <select id="strategy">
-
-                        <option value="avalanche">
-                            🔥 Avalanche (Highest APR)
-                        </option>
-
-                        <option value="snowball">
-                            ❄️ Snowball (Smallest Balance)
-                        </option>
-
-                    </select>
-
-                </div>
-
-                <button
-                    class="planner-button"
-                    onclick="calculatePlan()">
-
-                    Calculate Plan
-
-                </button>
-
-            </div>
-
-            <div class="reverse-planner">
-
-                <p class="reverse-planner-label">Or work backwards — pick a deadline and I'll tell you what to pay:</p>
-
-                <div class="reverse-planner-row">
-
-                    <div class="reverse-planner-field">
-                        <label for="targetTimeframe">Debt-Free In</label>
-                        <select id="targetTimeframe" onchange="toggleCustomMonthsField()">
-                            <option value="6">6 Months</option>
-                            <option value="12" selected>1 Year</option>
-                            <option value="18">18 Months</option>
-                            <option value="24">2 Years</option>
-                            <option value="36">3 Years</option>
-                            <option value="60">5 Years</option>
-                            <option value="custom">Custom…</option>
+                        <select id="debtType" onchange="toggleDebtTypeFields()" title="A card is revolving credit with a flexible balance; a loan has a fixed payment over a fixed term.">
+                            <option value="card">💳 Credit Card</option>
+                            <option value="loan">🏦 Loan</option>
                         </select>
+
+                        <input type="text" id="lender" placeholder="Lender">
+                        <input type="number" id="balance" placeholder="Balance">
+                        <input type="number" id="apr" placeholder="APR">
+
+                        <input type="number" id="totalRepayable" class="loan-field hidden" step="0.01"
+                            title="The total amount you'll repay over the loan — straight off your loan agreement. This is what the tracker counts down."
+                            placeholder="Total repayable">
+
+                        <input type="number" id="loanMonthly" class="loan-field hidden" step="0.01"
+                            title="Your actual fixed monthly payment, off the agreement." placeholder="Monthly payment">
+
+                        <input type="number" id="termMonths" class="loan-field hidden" min="1" step="1"
+                            title="How many months the loan runs for." placeholder="Term (months)">
+
+                        <input type="number" id="limit" class="card-field" placeholder="Credit Limit">
+                        <input type="number" id="minimum" class="card-field" placeholder="Min Payment">
+
+                        <input type="number" id="minPercent" class="card-field" step="0.1"
+                            title="Optional — most cards require the greater of this % of your balance or the flat Min Payment above. Leave blank to always use the flat amount."
+                            placeholder="Min % (optional)">
+
+                        <input type="number" id="promoApr" class="card-field"
+                            title="Optional — leave blank if this card has no 0% promo" placeholder="Promo APR %">
+
+                        <input type="date" id="promoEndDate" class="card-field" placeholder="Promo Ends (optional)">
+
+                        <input type="number" id="fixedPayment" class="card-field"
+                            title="Optional — the amount you actually pay each month, if more than the minimum" placeholder="Fixed Payment">
+
+                        <button id="addDebtButton" onclick="addDebt()">Add Debt</button>
+                        <button id="cancelEditButton" class="hidden" onclick="cancelEdit()">Cancel</button>
+
                     </div>
 
-                    <div class="reverse-planner-field hidden" id="customMonthsField">
-                        <label for="customMonths">Months</label>
-                        <input type="number" id="customMonths" min="1" step="1" placeholder="e.g. 15">
+                    <div id="debts"></div>
+
+                </section>
+
+                <!-- ===== LOG PAYMENT ===== -->
+                <section id="tab-payments" class="tab-content">
+                    <h2>Log a Payment</h2>
+                    <p class="page-lede">Made a payment this month? Log it here and your balances update straight away.</p>
+                    <div id="paymentsList"></div>
+                </section>
+
+                <!-- ===== PLANNER ===== -->
+                <section id="tab-planner" class="tab-content">
+
+                    <h2>Repayment Planner</h2>
+
+                    <div class="planner">
+                        <div class="planner-budget">
+                            <label for="monthlyBudget">Monthly Budget</label>
+                            <input type="number" id="monthlyBudget" placeholder="£350">
+                        </div>
+                        <div class="planner-strategy">
+                            <label for="strategy">Repayment Strategy</label>
+                            <select id="strategy">
+                                <option value="avalanche">🔥 Avalanche (Highest APR)</option>
+                                <option value="snowball">❄️ Snowball (Smallest Balance)</option>
+                            </select>
+                        </div>
+                        <button class="planner-button" onclick="calculatePlan()">Calculate Plan</button>
                     </div>
 
-                    <button class="planner-button" onclick="calculateRequiredBudget()">🎯 Work It Out</button>
+                    <div class="reverse-planner">
+                        <p class="reverse-planner-label">Or work backwards — pick a deadline and I'll tell you what to pay:</p>
+                        <div class="reverse-planner-row">
+                            <div class="reverse-planner-field">
+                                <label for="targetTimeframe">Debt-Free In</label>
+                                <select id="targetTimeframe" onchange="toggleCustomMonthsField()">
+                                    <option value="6">6 Months</option>
+                                    <option value="12" selected>1 Year</option>
+                                    <option value="18">18 Months</option>
+                                    <option value="24">2 Years</option>
+                                    <option value="36">3 Years</option>
+                                    <option value="60">5 Years</option>
+                                    <option value="custom">Custom…</option>
+                                </select>
+                            </div>
+                            <div class="reverse-planner-field hidden" id="customMonthsField">
+                                <label for="customMonths">Months</label>
+                                <input type="number" id="customMonths" min="1" step="1" placeholder="e.g. 15">
+                            </div>
+                            <button class="planner-button" onclick="calculateRequiredBudget()">🎯 Work It Out</button>
+                        </div>
+                        <div id="requiredBudgetResult"></div>
+                    </div>
 
-                </div>
+                    <div id="repaymentPlan"></div>
 
-                <div id="requiredBudgetResult"></div>
+                </section>
+
+                <!-- ===== INSIGHTS ===== -->
+                <section id="tab-insights" class="tab-content">
+                    <h2>Insights</h2>
+                    <p class="page-lede">A plain-English read on where you stand — updated from your data.</p>
+                    <div id="insightsFull"></div>
+                </section>
 
             </div>
-
-            <div id="repaymentPlan"></div>
-
-        </div>
-
+        </main>
     </div>
 
     <!-- ==========================
          PLAN ROW MODAL
     =========================== -->
-
     <div id="planRowModal" class="modal-overlay hidden" onclick="if (event.target === this) closePlanRowModal()">
         <div class="modal">
             <button class="modal-close" onclick="closePlanRowModal()">✕</button>
             <div class="modal-scroll">
-            <div id="planRowModalContent"></div>
+                <div id="planRowModalContent"></div>
             </div>
         </div>
     </div>
@@ -355,111 +282,80 @@
     <!-- ==========================
          SETTINGS MODAL
     =========================== -->
-
     <div id="settingsModal" class="modal-overlay hidden" onclick="if (event.target === this) closeSettingsModal()">
         <div class="modal">
             <button class="modal-close" onclick="closeSettingsModal()">✕</button>
             <div class="modal-scroll">
-            <h3 style="margin-bottom:20px;"><span class="ico">⚙️</span> Settings</h3>
+                <h3 style="margin-bottom:20px;"><span class="ico">⚙️</span> Settings</h3>
 
-            <div class="settings-section">
-                <h4>Layout</h4>
-                <p class="settings-hint">
-                    Pick the overall look and feel — everything else (colour, cards, planner, etc.) stays the same underneath.
-                </p>
-                <div class="layout-options">
-                    <button class="layout-option active" data-layout="classic" onclick="selectLayout('classic')">
-                        <span class="layout-option-name">Classic</span>
-                        <span class="layout-option-desc">The original bold, rounded, game-y look</span>
-                    </button>
-                    <button class="layout-option" data-layout="modern" onclick="selectLayout('modern')">
-                        <span class="layout-option-name">Modern Fintech</span>
-                        <span class="layout-option-desc">Clean sans-serif, soft shadows, breathing room</span>
-                    </button>
-                    <button class="layout-option" data-layout="corporate" onclick="selectLayout('corporate')">
-                        <span class="layout-option-name">Corporate</span>
-                        <span class="layout-option-desc">Structured, conservative, minimal colour</span>
-                    </button>
-                    <button class="layout-option" data-layout="terminal" onclick="selectLayout('terminal')">
-                        <span class="layout-option-name">Analyst Terminal</span>
-                        <span class="layout-option-desc">Dense, monospace, high-contrast dark</span>
-                    </button>
+                <div class="settings-section">
+                    <h4>Theme</h4>
+                    <p class="settings-hint">Three distinct looks — pick the one that feels right.</p>
+                    <div class="layout-options">
+                        <button class="layout-option active" data-layout="fintech" onclick="selectLayout('fintech')">
+                            <span class="layout-option-name">Fintech</span>
+                            <span class="layout-option-desc">Deep violet, glowing charts — a premium trading dashboard</span>
+                        </button>
+                        <button class="layout-option" data-layout="glass" onclick="selectLayout('glass')">
+                            <span class="layout-option-name">Glass</span>
+                            <span class="layout-option-desc">Frosted translucent panels, soft and airy</span>
+                        </button>
+                        <button class="layout-option" data-layout="industrial" onclick="selectLayout('industrial')">
+                            <span class="layout-option-name">Industrial</span>
+                            <span class="layout-option-desc">Graphite and orange, bold and technical</span>
+                        </button>
+                    </div>
                 </div>
-            </div>
 
-            <div class="settings-section">
-                <h4>Colour</h4>
-                <p class="settings-hint">
-                    Pick a background colour — surfaces, text and accents are all derived from it automatically.
-                </p>
-                <div class="theme-picker">
-                    <input
-                        type="color"
-                        id="themeColorPicker"
-                        value="#081512"
-                        oninput="handleThemeColorInput(this.value)">
-                    <input
-                        type="text"
-                        id="themeColorText"
-                        class="theme-hex-input"
-                        value="#081512"
-                        maxlength="7"
-                        oninput="handleThemeHexInput(this.value)">
-                    <button class="settings-btn" onclick="resetTheme()">Reset</button>
+                <div class="settings-section">
+                    <h4>Accent Colour</h4>
+                    <p class="settings-hint">Optional — nudge the accent to any colour. Each theme has its own default.</p>
+                    <div class="theme-picker">
+                        <input type="color" id="themeColorPicker" value="#0B0B12" oninput="handleThemeColorInput(this.value)">
+                        <input type="text" id="themeColorText" class="theme-hex-input" value="#0B0B12" maxlength="7" oninput="handleThemeHexInput(this.value)">
+                        <button class="settings-btn" onclick="resetTheme()">Reset</button>
+                    </div>
                 </div>
-                <div class="theme-presets">
-                    <button class="theme-swatch" style="background:#081512;" title="Racing Green (default)" onclick="selectThemePreset('#081512')"></button>
-                    <button class="theme-swatch" style="background:#0B1220;" title="Midnight Blue" onclick="selectThemePreset('#0B1220')"></button>
-                    <button class="theme-swatch" style="background:#1A0F1F;" title="Deep Plum" onclick="selectThemePreset('#1A0F1F')"></button>
-                    <button class="theme-swatch" style="background:#1C1917;" title="Warm Charcoal" onclick="selectThemePreset('#1C1917')"></button>
-                    <button class="theme-swatch" style="background:#4B5563;" title="Slate Grey" onclick="selectThemePreset('#4B5563')"></button>
-                    <button class="theme-swatch" style="background:#F1F1EE;" title="Soft White" onclick="selectThemePreset('#F1F1EE')"></button>
-                </div>
-            </div>
 
-            <div class="settings-section">
-                <h4>Backup Your Data</h4>
-                <p class="settings-hint">
-                    Everything lives only in this browser. Export a backup file, or restore one on another device.
-                </p>
-                <div class="settings-actions">
-                    <button class="settings-btn" onclick="exportData()">⬇️ Export Backup</button>
-                    <button class="settings-btn" onclick="document.getElementById('importFileInput').click()">⬆️ Import Backup</button>
-                    <button class="settings-btn" onclick="exportCsv()">📊 Export CSV</button>
+                <div class="settings-section">
+                    <h4>Back Up Your Data</h4>
+                    <p class="settings-hint">Everything lives only in this browser. Export a backup file, or restore one on another device.</p>
+                    <div class="settings-actions">
+                        <button class="settings-btn" onclick="exportData()">⬇️ Export Backup</button>
+                        <button class="settings-btn" onclick="document.getElementById('importFileInput').click()">⬆️ Import Backup</button>
+                        <button class="settings-btn" onclick="exportCsv()">📊 Export CSV</button>
+                    </div>
+                    <input type="file" id="importFileInput" accept="application/json" class="hidden" onchange="importData(event)">
                 </div>
-                <input type="file" id="importFileInput" accept="application/json" class="hidden" onchange="importData(event)">
-            </div>
 
-            <div class="settings-section">
-                <h4>Danger Zone</h4>
-                <p class="settings-hint">
-                    Permanently deletes every debt and setting stored in this browser. This can't be undone.
-                </p>
-                <button class="settings-btn danger" onclick="resetAllData()">🗑️ Reset All Data</button>
-            </div>
+                <div class="settings-section">
+                    <h4>Danger Zone</h4>
+                    <p class="settings-hint">Permanently deletes every debt and setting stored in this browser. This can't be undone.</p>
+                    <button class="settings-btn danger" onclick="resetAllData()">🗑️ Reset All Data</button>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Full-screen confetti burst, drawn when a debt is fully paid off -->
     <canvas id="confettiCanvas" class="hidden"></canvas>
 
-    <script src="js/debts.js?v=52"></script>
-    <script src="js/ui.js?v=52"></script>
-    <script src="js/storage.js?v=52"></script>
-    <script src="js/calculations.js?v=52"></script>
-    <script src="js/progress.js?v=52"></script>
-    <script src="js/payments.js?v=52"></script>
-    <script src="js/tabs.js?v=52"></script>
-    <script src="js/settings.js?v=52"></script>
-    <script src="js/theme.js?v=52"></script>
-    <script src="js/layout.js?v=52"></script>
-    <script src="js/advisor.js?v=52"></script>
-    <script src="js/confetti.js?v=52"></script>
+    <script src="js/debts.js?v=53"></script>
+    <script src="js/ui.js?v=53"></script>
+    <script src="js/storage.js?v=53"></script>
+    <script src="js/calculations.js?v=53"></script>
+    <script src="js/progress.js?v=53"></script>
+    <script src="js/insights.js?v=53"></script>
+    <script src="js/payments.js?v=53"></script>
+    <script src="js/tabs.js?v=53"></script>
+    <script src="js/settings.js?v=53"></script>
+    <script src="js/theme.js?v=53"></script>
+    <script src="js/layout.js?v=53"></script>
+    <script src="js/advisor.js?v=53"></script>
+    <script src="js/confetti.js?v=53"></script>
 
-    <script src="js/repaymentEngine.js?v=52"></script>
-    <script src="js/planner.js?v=52"></script>
-    <script src="js/app.js?v=52"></script>
+    <script src="js/repaymentEngine.js?v=53"></script>
+    <script src="js/planner.js?v=53"></script>
+    <script src="js/app.js?v=53"></script>
 
     <script>
         if ("serviceWorker" in navigator) {

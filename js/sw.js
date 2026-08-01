@@ -9,7 +9,7 @@
    to tell if you're looking at the latest code.
 ========================================= */
 
-const CACHE_NAME = "debt-manager-v12";
+const CACHE_NAME = "debt-manager-v13";
 
 const PRECACHE_URLS = [
     "./",

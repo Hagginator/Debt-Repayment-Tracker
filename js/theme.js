@@ -234,7 +234,11 @@ function resetTheme() {
     ["--bg", "--bg-deep", "--surface", "--surface-light", "--surface-hover",
      "--text", "--muted", "--accent", "--accent-rgb", "--accent-contrast", "--primary", "--primary-hover", "--border"]
         .forEach(prop => root.style.removeProperty(prop));
-    syncThemeInputs(DEFAULT_BG_COLOUR);
+
+    // Show the active theme's own base colour, not a hardcoded default —
+    // each theme defines its own --bg in CSS.
+    const themeBg = getComputedStyle(root).getPropertyValue("--bg").trim();
+    syncThemeInputs(/^#[0-9A-Fa-f]{6}$/.test(themeBg) ? themeBg : DEFAULT_BG_COLOUR);
 }
 
 function loadTheme() {
