@@ -76,4 +76,8 @@ function updateSummary() {
     } else {
         utilisationCard.classList.add("util-red");
     }
+
+    // Redraw the debt-over-time chart whenever the totals move — covers
+    // load, payments, charges, edits, add and delete in one hook.
+    if (typeof renderProgressChart === "function") renderProgressChart();
 }

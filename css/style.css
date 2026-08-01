@@ -1301,3 +1301,46 @@ body { transition:background .4s ease, color .4s ease; }
     transition-duration:.4s;
     transition-timing-function:ease;
 }
+
+/* =========================================
+   PROGRESS CHART (progress.js)
+   Total debt over time, reconstructed from the
+   payment history. Colours ride the theme vars.
+========================================= */
+
+.progress-section {
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    padding:20px 22px 14px;
+    margin-bottom:24px;
+    box-shadow:var(--shadow);
+}
+.progress-section.hidden { display:none; }
+
+.progress-head {
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:6px 14px;
+    margin-bottom:10px;
+}
+.progress-head h2 { margin:0; }
+.progress-caption { color:var(--muted); font-size:.9rem; }
+.progress-caption strong { color:var(--accent); }
+
+.pg-svg { width:100%; height:auto; display:block; overflow:visible; }
+.pg-line {
+    fill:none;
+    stroke:var(--accent);
+    stroke-width:2.5;
+    stroke-linejoin:round;
+    stroke-linecap:round;
+    vector-effect:non-scaling-stroke;
+}
+.pg-area { fill:var(--accent); opacity:.15; stroke:none; }
+.pg-grid { stroke:var(--border); stroke-width:1; vector-effect:non-scaling-stroke; }
+.pg-dot { fill:var(--accent); stroke:var(--surface); stroke-width:1.5; transition:none; }
+.pg-ylab { fill:var(--muted); font-family:var(--font-body); font-size:22px; text-anchor:end; }
+.pg-xlab { fill:var(--muted); font-family:var(--font-body); font-size:22px; }

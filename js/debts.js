@@ -81,6 +81,7 @@ function addDebt() {
 
     if (editingIndex === null) {
         debt.history = [];
+        debt.createdAt = new Date().toISOString(); // anchors the progress chart's start date
         debts.push(debt);
     } else {
         const existing = debts[editingIndex];
